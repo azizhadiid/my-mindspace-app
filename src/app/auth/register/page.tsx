@@ -1,93 +1,17 @@
 'use client'
 
 import React, { useState } from 'react';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import WelcomePanel from '@/components/ui/welcomePanel';
 import RegistrationForm from '@/components/register/registerForm';
 
-// Define interfaces for form data and errors
-interface IFormData {
-    username: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
-}
-
-interface IFormErrors {
-    username?: string;
-    email?: string;
-    password?: string;
-    confirmPassword?: string;
-}
-
-const App = () => {
-    const [formData, setFormData] = useState<IFormData>({
-        username: '',
-        email: '',
-        password: '',
-        confirmPassword: ''
-    });
-    const [errors, setErrors] = useState<IFormErrors>({});
-    const [showPassword, setShowPassword] = useState<boolean>(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+const RegisterPage = () => {
+    // State for showing the success modal, managed at the page level
     const [showSuccess, setShowSuccess] = useState<boolean>(false);
 
-    const handleInputChange = (field: keyof IFormData, value: string) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
-        if (errors[field]) {
-            setErrors(prev => ({ ...prev, [field]: '' }));
-        }
-    };
-
-    const validateForm = (): boolean => {
-        const newErrors: IFormErrors = {};
-
-        if (!formData.username.trim()) {
-            newErrors.username = 'Username is required';
-        } else if (formData.username.length < 3) {
-            newErrors.username = 'Username must be at least 3 characters';
-        }
-
-        if (!formData.email.trim()) {
-            newErrors.email = 'Email is required';
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = 'Please enter a valid email';
-        }
-
-        if (!formData.password) {
-            newErrors.password = 'Password is required';
-        } else if (formData.password.length < 6) {
-            newErrors.password = 'Password must be at least 6 characters';
-        }
-
-        if (!formData.confirmPassword) {
-            newErrors.confirmPassword = 'Please confirm your password';
-        } else if (formData.password !== formData.confirmPassword) {
-            newErrors.confirmPassword = 'Passwords do not match';
-        }
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    const handleSubmit = async () => {
-        if (!validateForm()) return;
-
-        setIsLoading(true);
-        setTimeout(() => {
-            setIsLoading(false);
-            setShowSuccess(true);
-            setFormData({
-                username: '',
-                email: '',
-                password: '',
-                confirmPassword: ''
-            });
-            setErrors({});
-            setShowPassword(false);
-            setShowConfirmPassword(false);
-        }, 2000);
+    // This function will be called by RegistrationForm on successful registration
+    const handleRegistrationSuccess = () => {
+        setShowSuccess(true);
     };
 
     return (
@@ -100,20 +24,11 @@ const App = () => {
 
             <div className="flex min-h-screen">
                 <WelcomePanel />
-                <RegistrationForm
-                    formData={formData}
-                    errors={errors}
-                    handleInputChange={handleInputChange}
-                    showPassword={showPassword}
-                    togglePassword={() => setShowPassword(!showPassword)}
-                    showConfirmPassword={showConfirmPassword}
-                    toggleConfirmPassword={() => setShowConfirmPassword(!showConfirmPassword)}
-                    handleSubmit={handleSubmit}
-                    isLoading={isLoading}
-                />
+                <RegistrationForm onRegistrationSuccess={handleRegistrationSuccess} />
             </div>
         </div>
     );
 };
 
-export default App;
+export default RegisterPage;
+
