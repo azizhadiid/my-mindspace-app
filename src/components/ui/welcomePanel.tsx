@@ -1,4 +1,5 @@
 'use client'
+
 import React from 'react';
 import { Heart, Sparkles, User } from 'lucide-react';
 import BrainCharacter from '../animation/brainCharacter';

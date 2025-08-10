@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react';
 import { User, Mail, Lock, ArrowRight } from 'lucide-react';
 import { toast } from 'react-hot-toast';
