@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { Mail, Lock, ArrowRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { toast } from "react-hot-toast";
 import BrainCharacter from '../animation/brainCharacter';
 import InputField from '../form/input';
 
@@ -14,6 +16,7 @@ interface IFormData {
 }
 
 const LoginForm = () => {
+    const router = useRouter();
     const [formData, setFormData] = useState<IFormData>({
         email: '',
         password: '',
@@ -30,15 +33,40 @@ const LoginForm = () => {
         }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        // Simulate API call
-        setTimeout(() => {
-            console.log('Login data:', formData);
+
+        try {
+            const res = await fetch("/api/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    email: formData.email,
+                    password: formData.password,
+                }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                // Tangani error dari API, contoh: "Email tidak ditemukan"
+                toast.error(data.error || "Login gagal. Coba lagi.");
+            } else {
+                if (data.role === "ADMIN") {
+                    router.push("/admin/dashboard");
+                } else if (data.role === "PSIKOLOG") {
+                    router.push("/psikolog/dashboard");
+                } else {
+                    router.push("/member/home");
+                }
+            }
+        } catch (err) {
+            console.error("Fetch error:", err);
+            toast.error("Terjadi kesalahan server. Silakan coba lagi.");
+        } finally {
             setIsLoading(false);
-            // In a real app, you would handle login success/failure here
-        }, 2000);
+        }
     };
 
     return (
