@@ -1,11 +1,11 @@
 'use client';
 
 import AdminLayout from '@/components/templates/admin/MainTemplateAdmin';
-import DashboardContent from '@/components/templates/admin/Dashboard/DashboardContent';
 import Sidebar from '@/components/templates/admin/SideBar';
 import React, { useState } from 'react';
+import PlaceholderContent from '@/components/templates/admin/Dashboard/PlaceholderContent';
 
-const AdminDashboardPage = () => {
+const VerifikasiKonsultasiPagae = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     return (
@@ -17,10 +17,10 @@ const AdminDashboardPage = () => {
             <AdminLayout
                 setSidebarOpen={setSidebarOpen}
             >
-                <DashboardContent />
+                <PlaceholderContent title="Verifikasi Konsultasi" description="Review dan verifikasi sesi konsultasi untuk memastikan kualitas layanan." />
             </AdminLayout>
         </div>
     );
 };
 
-export default AdminDashboardPage;
+export default VerifikasiKonsultasiPagae;

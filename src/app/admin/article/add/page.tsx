@@ -1,11 +1,11 @@
 'use client';
 
 import AdminLayout from '@/components/templates/admin/MainTemplateAdmin';
-import DashboardContent from '@/components/templates/admin/Dashboard/DashboardContent';
 import Sidebar from '@/components/templates/admin/SideBar';
 import React, { useState } from 'react';
+import PlaceholderContent from '@/components/templates/admin/Dashboard/PlaceholderContent';
 
-const AdminDashboardPage = () => {
+const TambahArtikelPage = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     return (
@@ -17,10 +17,10 @@ const AdminDashboardPage = () => {
             <AdminLayout
                 setSidebarOpen={setSidebarOpen}
             >
-                <DashboardContent />
+                <PlaceholderContent title="Tambah Artikel" description="Buat artikel baru untuk membantu pengguna memahami kesehatan mental dengan lebih baik." />
             </AdminLayout>
         </div>
     );
 };
 
-export default AdminDashboardPage;
+export default TambahArtikelPage;
