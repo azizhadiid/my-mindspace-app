@@ -1,9 +1,9 @@
 'use client';
 
+import AddArticleContent from '@/components/templates/admin/article/addArticleContent';
 import AdminLayout from '@/components/templates/admin/MainTemplateAdmin';
 import Sidebar from '@/components/templates/admin/SideBar';
 import React, { useState } from 'react';
-import PlaceholderContent from '@/components/templates/admin/Dashboard/PlaceholderContent';
 
 const TambahArtikelPage = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -17,7 +17,7 @@ const TambahArtikelPage = () => {
             <AdminLayout
                 setSidebarOpen={setSidebarOpen}
             >
-                <PlaceholderContent title="Tambah Artikel" description="Buat artikel baru untuk membantu pengguna memahami kesehatan mental dengan lebih baik." />
+                <AddArticleContent />
             </AdminLayout>
         </div>
     );
