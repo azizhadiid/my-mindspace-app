@@ -25,10 +25,10 @@ export function middleware(req: NextRequest) {
 
         return NextResponse.next();
     } catch (err) {
-        return NextResponse.redirect(new URL("/login", req.url));
+        return NextResponse.redirect(new URL("/auth/login", req.url));
     }
 }
 
 export const config = {
-    matcher: ["/member/:path*", "/admin/:path*", "/psikolog/:path*"],
+    matcher: ["/member/:path*", "/admin/:path*", "/psikolog/:path*", "/admin/articles/:path*"],
 };

@@ -14,14 +14,28 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String
-  email         String   @unique
+  email         String    @unique
   password      String
-  role          Role     @default(MEMBER)
+  role          Role      @default(MEMBER)
   rememberToken String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  Article       Article[]
+}
+
+model Article {
+  id          String   @id @default(cuid())
+  title       String
+  category    String
+  publishDate DateTime
+  image       String // URL gambar yang diupload
+  content     String
+  author      User     @relation(fields: [authorId], references: [id])
+  authorId    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 enum Role {

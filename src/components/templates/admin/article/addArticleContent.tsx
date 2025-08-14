@@ -6,6 +6,7 @@ import TextAreaField from './TextAreaField';
 import SelectField from './SelectField';
 import ImageUploadField from './ImageUploadField';
 import SubmitButton from './SubmitButton';
+import Swal from "sweetalert2";
 
 const AddArticleContent = () => {
     // Pindahkan semua state ke dalam komponen
@@ -19,10 +20,10 @@ const AddArticleContent = () => {
 
     // Categories for the select field
     const categories = [
-        { value: "IT Consulting", label: "IT Consulting" },
-        { value: "Business Strategy", label: "Business Strategy" },
-        { value: "Digital Transformation", label: "Digital Transformation" },
-        { value: "Cyber Security", label: "Cyber Security" },
+        { value: "Kesehatan Mental", label: "Kesehatan Mental" },
+        { value: "Hidup Sehat Tahun 2025", label: "Hidup Sehat Tahun 2025" },
+        { value: "Dampak Digital Terhadap Mental", label: "Dampak Digital Terhadap Mental" },
+        { value: "Sosial Media dan Kesehatan Mental", label: "Sosial Media dan Kesehatan Mental" },
     ];
 
     // Logika handleImageChange
@@ -40,21 +41,57 @@ const AddArticleContent = () => {
     };
 
     // Fungsi ini sekarang hanya akan melakukan simulasi atau menampilkan data di konsol
-    const handleSubmit = () => {
-        setLoading(true);
-        // Simulasi proses pengiriman data
-        setTimeout(() => {
-            console.log("Data Artikel yang disubmit:", {
-                title,
-                content,
-                category,
-                date,
-                featuredImage,
+    const handleSubmit = async () => {
+        if (!featuredImage) {
+            Swal.fire({
+                icon: "warning",
+                title: "Oops...",
+                text: "Pilih gambar terlebih dahulu!",
             });
-            // Reset loading state
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const formData = new FormData();
+            formData.append("title", title);
+            formData.append("category", category);
+            formData.append("publishDate", date);
+            formData.append("content", content);
+            formData.append("image", featuredImage);
+
+            const res = await fetch("/api/articles", {
+                method: "POST",
+                body: formData,
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Gagal menambahkan artikel");
+
+            // Alert sukses
+            Swal.fire({
+                icon: "success",
+                title: "Artikel berhasil diupload!",
+                showConfirmButton: false,
+                timer: 1500,
+            });
+
+            // Reset form
+            setTitle("");
+            setContent("");
+            setCategory("");
+            setDate("");
+            setFeaturedImage(null);
+            setImagePreview(null);
+        } catch (err: any) {
+            Swal.fire({
+                icon: "error",
+                title: "Gagal",
+                text: err.message,
+            });
+        } finally {
             setLoading(false);
-            alert('Artikel berhasil disubmit! Cek console untuk data.')
-        }, 1500);
+        }
     };
 
     return (
