@@ -46,10 +46,10 @@ const EditArtikelContent = () => {
             const data = await response.json();
             setArtikels(data.articles.map((artikel: any) => ({
                 id: artikel.id,
-                title: artikel.title,
+                title: artikel.title, // Sesuaikan dengan 'title' dari Prisma
                 category: artikel.category,
-                publishDate: artikel.publishDate,
-                image: artikel.image,
+                publishDate: artikel.publishDate, // Sesuaikan dengan 'publishDate' dari Prisma
+                image: artikel.image, // Sesuaikan dengan 'image' dari Prisma
             }))); // Sesuaikan field dari API ke interface Artikel
             setTotalItems(data.totalItems);
             setTotalPages(data.totalPages);
