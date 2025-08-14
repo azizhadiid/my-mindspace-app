@@ -3,7 +3,7 @@
 import AdminLayout from '@/components/templates/admin/MainTemplateAdmin';
 import Sidebar from '@/components/templates/admin/SideBar';
 import React, { useState } from 'react';
-import PlaceholderContent from '@/components/templates/admin/Dashboard/PlaceholderContent';
+import EditArtikelContent from '@/components/templates/admin/article/edit/EditArticleContent';
 
 const EditArtikelPage = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -17,7 +17,7 @@ const EditArtikelPage = () => {
             <AdminLayout
                 setSidebarOpen={setSidebarOpen}
             >
-                <PlaceholderContent title="Edit Artikel" description="Kelola dan update artikel yang sudah ada untuk memberikan informasi terbaru." />
+                <EditArtikelContent />
             </AdminLayout>
         </div>
     );
