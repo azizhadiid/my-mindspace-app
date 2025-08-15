@@ -31,7 +31,10 @@ export async function POST(req: Request) {
             },
         });
 
-        return NextResponse.json({ message: "User berhasil dibuat", user });
+        // Hapus password dari objek user sebelum dikirim ke client untuk keamanan
+        const { password: _, ...userWithoutPassword } = user;
+
+        return NextResponse.json({ message: "User berhasil dibuat", user: userWithoutPassword }, { status: 201 }); // Status 201 Created
     } catch (error) {
         console.error(error);
         return NextResponse.json({ error: "Terjadi kesalahan server" }, { status: 500 });

@@ -8,14 +8,14 @@ import InputField from '../form/input';
 
 // Define interfaces for form data and errors
 interface IFormData {
-    username: string;
+    name: string;
     email: string;
     password: string;
     confirmPassword: string;
 }
 
 interface IFormErrors {
-    username?: string;
+    name?: string;
     email?: string;
     password?: string;
     confirmPassword?: string;
@@ -27,7 +27,7 @@ interface IRegistrationFormProps {
 
 const RegistrationForm = ({ onRegistrationSuccess }: IRegistrationFormProps) => {
     const [formData, setFormData] = useState<IFormData>({
-        username: '',
+        name: '',
         email: '',
         password: '',
         confirmPassword: ''
@@ -50,10 +50,10 @@ const RegistrationForm = ({ onRegistrationSuccess }: IRegistrationFormProps) => 
     const validateForm = (): boolean => {
         const newErrors: IFormErrors = {};
 
-        if (!formData.username.trim()) {
-            newErrors.username = 'Username is required';
-        } else if (formData.username.length < 3) {
-            newErrors.username = 'Username must be at least 3 characters';
+        if (!formData.name.trim()) {
+            newErrors.name = 'Name is required';
+        } else if (formData.name.length < 3) {
+            newErrors.name = 'Name must be at least 3 characters';
         }
 
         if (!formData.email.trim()) {
@@ -85,12 +85,12 @@ const RegistrationForm = ({ onRegistrationSuccess }: IRegistrationFormProps) => 
         setIsLoading(true);
 
         try {
-            // FIX: Mengubah key 'username' menjadi 'name' agar sesuai dengan API
+            // FIX: Mengubah key 'name' menjadi 'name' agar sesuai dengan API
             const res = await fetch("/api/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    name: formData.username, // Menggunakan 'name' agar sesuai skema Prisma
+                    name: formData.name, // Menggunakan 'name' agar sesuai skema Prisma
                     email: formData.email,
                     password: formData.password,
                     role: "MEMBER"
@@ -102,9 +102,9 @@ const RegistrationForm = ({ onRegistrationSuccess }: IRegistrationFormProps) => 
             if (!res.ok) {
                 toast.error(data.error || "Registrasi gagal");
             } else {
-                toast.success("Registrasi berhasil!");
+                toast.success("Registrasi berhasil, Silahkan masuk");
                 // Clear form state and show success message
-                setFormData({ username: '', email: '', password: '', confirmPassword: '' });
+                setFormData({ name: '', email: '', password: '', confirmPassword: '' });
                 onRegistrationSuccess();
             }
         } catch (err) {
@@ -136,14 +136,14 @@ const RegistrationForm = ({ onRegistrationSuccess }: IRegistrationFormProps) => 
 
                     <form className="space-y-6" onSubmit={handleSubmit}>
                         <InputField
-                            label="Username"
-                            name="username"
+                            label="Name"
+                            name="name"
                             type="text"
-                            placeholder="Choose a username"
-                            value={formData.username}
+                            placeholder="Choose a Name"
+                            value={formData.name}
                             onChange={handleInputChange}
                             icon={User}
-                            error={errors.username}
+                            error={errors.name}
                         />
 
                         <InputField
