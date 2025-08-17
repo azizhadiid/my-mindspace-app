@@ -15,7 +15,7 @@ interface IFormData {
     rememberMe: boolean;
 }
 
-const LoginForm = () => {
+const ForgotPasswordForm = () => {
     const router = useRouter();
     const [formData, setFormData] = useState<IFormData>({
         email: '',
@@ -23,7 +23,6 @@ const LoginForm = () => {
         rememberMe: false,
     });
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [showPassword, setShowPassword] = useState<boolean>(false);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target;
@@ -84,8 +83,8 @@ const LoginForm = () => {
 
                 <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl">
                     <div className="text-center mb-8">
-                        <h2 className="text-2xl font-bold text-gray-800 mb-2">Login to your Account</h2>
-                        <p className="text-gray-600">Please enter your credentials</p>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-2">Forgot your password?{' '}</h2>
+                        <p className="text-gray-600">Please enter your Email</p>
                     </div>
 
                     <form className="space-y-6" onSubmit={handleSubmit}>
@@ -99,39 +98,6 @@ const LoginForm = () => {
                             icon={Mail}
                         />
 
-                        <InputField
-                            label="Password"
-                            name="password"
-                            type="password"
-                            placeholder="Enter your password"
-                            value={formData.password}
-                            onChange={handleInputChange}
-                            icon={Lock}
-                            showPassword={showPassword}
-                            togglePassword={() => setShowPassword(!showPassword)}
-                        />
-
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center">
-                                <input
-                                    id="remember-me"
-                                    name="rememberMe"
-                                    type="checkbox"
-                                    checked={formData.rememberMe}
-                                    onChange={handleInputChange}
-                                    className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
-                                />
-                                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                                    Remember me
-                                </label>
-                            </div>
-                            <div className="text-sm">
-                                <a href="/auth/forgotPassword" className="font-medium text-pink-500 hover:text-pink-600">
-                                    Forgot your password?
-                                </a>
-                            </div>
-                        </div>
-
                         <button
                             type="submit"
                             disabled={isLoading}
@@ -141,7 +107,7 @@ const LoginForm = () => {
                                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                             ) : (
                                 <>
-                                    <span>Log In</span>
+                                    <span>Send Email</span>
                                     <ArrowRight className="w-4 h-4" />
                                 </>
                             )}
@@ -156,6 +122,15 @@ const LoginForm = () => {
                                 className="text-pink-500 hover:text-pink-600 font-semibold hover:underline transition-colors"
                             >
                                 Sign up here
+                            </a>
+                        </p>
+                        <p className="text-gray-600">
+                            Have an account?{' '}
+                            <a
+                                href="/auth/login"
+                                className="text-pink-500 hover:text-pink-600 font-semibold hover:underline transition-colors"
+                            >
+                                Sign in here
                             </a>
                         </p>
                     </div>
@@ -174,4 +149,4 @@ const LoginForm = () => {
     );
 };
 
-export default LoginForm;
+export default ForgotPasswordForm;
