@@ -1,18 +1,12 @@
 'use client'
 
 import React, { useState } from 'react';
-import { Sparkles } from 'lucide-react';
 import WelcomePanel from '@/components/ui/welcomePanel';
 import RegistrationForm from '@/components/auth/registerForm';
 
 const RegisterPage = () => {
     // State for showing the success modal, managed at the page level
     const [showSuccess, setShowSuccess] = useState<boolean>(false);
-
-    // This function will be called by RegistrationForm on successful registration
-    const handleRegistrationSuccess = () => {
-        setShowSuccess(true);
-    };
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-orange-100 via-pink-50 to-purple-100 relative overflow-hidden font-sans">
@@ -24,7 +18,7 @@ const RegisterPage = () => {
 
             <div className="flex min-h-screen">
                 <WelcomePanel />
-                <RegistrationForm onRegistrationSuccess={handleRegistrationSuccess} />
+                <RegistrationForm />
             </div>
         </div>
     );

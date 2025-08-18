@@ -21,11 +21,7 @@ interface IFormErrors {
     confirmPassword?: string;
 }
 
-interface IRegistrationFormProps {
-    onRegistrationSuccess: () => void;
-}
-
-const RegistrationForm = ({ onRegistrationSuccess }: IRegistrationFormProps) => {
+const RegistrationForm = () => {
     const [formData, setFormData] = useState<IFormData>({
         name: '',
         email: '',
@@ -100,15 +96,14 @@ const RegistrationForm = ({ onRegistrationSuccess }: IRegistrationFormProps) => 
             const data = await res.json();
 
             if (!res.ok) {
-                toast.error(data.error || "Registrasi gagal");
+                toast.error(data.error || "Registration failed. Please try again.");
             } else {
-                toast.success("Registrasi berhasil, Silahkan masuk");
+                toast.success("Registration successful! Please sign in.");
                 // Clear form state and show success message
                 setFormData({ name: '', email: '', password: '', confirmPassword: '' });
-                onRegistrationSuccess();
             }
         } catch (err) {
-            toast.error("Terjadi kesalahan server");
+            toast.error("An error occurred while registering. Please try again.");
             console.error("Fetch error:", err); // Tambahkan log untuk debugging lebih lanjut
         } finally {
             setIsLoading(false);
