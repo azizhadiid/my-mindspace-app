@@ -17,19 +17,15 @@ interface IFormData {
 
 const LoginForm = () => {
     const router = useRouter();
-    const [formData, setFormData] = useState<IFormData>({
-        email: '',
-        password: '',
-        rememberMe: false,
-    });
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [showPassword, setShowPassword] = useState<boolean>(false);
+    const [formData, setFormData] = useState<IFormData>({ email: "", password: "", rememberMe: false });
+    const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target;
         setFormData(prev => ({
             ...prev,
-            [name]: type === 'checkbox' ? checked : value
+            [name]: type === "checkbox" ? checked : value,
         }));
     };
 
@@ -41,33 +37,35 @@ const LoginForm = () => {
             const res = await fetch("/api/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    email: formData.email,
-                    password: formData.password,
-                }),
+                body: JSON.stringify({ email: formData.email, password: formData.password }),
             });
 
             const data = await res.json();
 
             if (!res.ok) {
-                // Tangani error dari API, contoh: "Email tidak ditemukan"
-                toast.error(data.error || "Login gagal. Coba lagi.");
+                toast.error(data.error || "Login failed");
             } else {
+                toast.success("Login successful!");
+
+                // Cek role dan redirect
                 if (data.role === "ADMIN") {
                     router.push("/admin/dashboard");
-                } else if (data.role === "PSIKOLOG") {
-                    router.push("/psikolog/dashboard");
-                } else {
+                } else if (data.role === "MEMBER") {
                     router.push("/member/home");
+                } else if (data.role === "PSIKOLOG") {
+                    router.push("/psikolog/home");
+                } else {
+                    router.push("/"); // fallback
                 }
             }
-        } catch (err) {
-            console.error("Fetch error:", err);
-            toast.error("Terjadi kesalahan server. Silakan coba lagi.");
+        } catch (error) {
+            console.error("Login error:", error);
+            toast.error("Something went wrong");
         } finally {
             setIsLoading(false);
         }
     };
+
 
     return (
         <div className="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-12">
