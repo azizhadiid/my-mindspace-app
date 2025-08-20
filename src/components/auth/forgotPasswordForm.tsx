@@ -8,61 +8,32 @@ import BrainCharacter from '../animation/brainCharacter';
 import InputField from '../form/input';
 
 
-// Define interfaces for form data
-interface IFormData {
-    email: string;
-    password: string;
-    rememberMe: boolean;
-}
-
 const ForgotPasswordForm = () => {
-    const router = useRouter();
-    const [formData, setFormData] = useState<IFormData>({
-        email: '',
-        password: '',
-        rememberMe: false,
-    });
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
-    };
+    const [email, setEmail] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
 
         try {
-            const res = await fetch("/api/login", {
+            const res = await fetch("/api/auth/forgot-password", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    email: formData.email,
-                    password: formData.password,
-                }),
+                body: JSON.stringify({ email }),
             });
 
             const data = await res.json();
 
             if (!res.ok) {
-                // Tangani error dari API, contoh: "Email tidak ditemukan"
-                toast.error(data.error || "Login gagal. Coba lagi.");
+                toast.error(data.error || "Email is not found");
             } else {
-                if (data.role === "ADMIN") {
-                    router.push("/admin/dashboard");
-                } else if (data.role === "PSIKOLOG") {
-                    router.push("/psikolog/dashboard");
-                } else {
-                    router.push("/member/home");
-                }
+                toast.success("Password reset link sent to email!");
+                setEmail("");
             }
         } catch (err) {
-            console.error("Fetch error:", err);
-            toast.error("Terjadi kesalahan server. Silakan coba lagi.");
+            console.error("Forgot password error:", err);
+            toast.error("internal server error");
         } finally {
             setIsLoading(false);
         }
@@ -93,8 +64,8 @@ const ForgotPasswordForm = () => {
                             name="email"
                             type="email"
                             placeholder="Enter your email"
-                            value={formData.email}
-                            onChange={handleInputChange}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             icon={Mail}
                         />
 

@@ -2,68 +2,53 @@
 
 import React, { useState } from 'react';
 import { Mail, Lock, ArrowRight } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from "react-hot-toast";
 import BrainCharacter from '../animation/brainCharacter';
 import InputField from '../form/input';
 
-
-// Define interfaces for form data
-interface IFormData {
-    email: string;
-    password: string;
-    rememberMe: boolean;
-}
-
 const ResetPasswordForm = () => {
+    const params = useSearchParams();
+    const token = params.get("token"); // token dari link email
     const router = useRouter();
-    const [formData, setFormData] = useState<IFormData>({
-        email: '',
-        password: '',
-        rememberMe: false,
-    });
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [showPassword, setShowPassword] = useState<boolean>(false);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
-    };
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsLoading(true);
 
+        if (!token) {
+            toast.error("Token tidak valid!");
+            return;
+        }
+        if (password !== confirmPassword) {
+            toast.error("Password tidak sama!");
+            return;
+        }
+
+        setIsLoading(true);
         try {
-            const res = await fetch("/api/login", {
+            const res = await fetch("/api/auth/reset-password", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    email: formData.email,
-                    password: formData.password,
-                }),
+                body: JSON.stringify({ token, password }),
             });
 
             const data = await res.json();
 
             if (!res.ok) {
-                // Tangani error dari API, contoh: "Email tidak ditemukan"
-                toast.error(data.error || "Login gagal. Coba lagi.");
+                toast.error(data.error || "Gagal reset password");
             } else {
-                if (data.role === "ADMIN") {
-                    router.push("/admin/dashboard");
-                } else if (data.role === "PSIKOLOG") {
-                    router.push("/psikolog/dashboard");
-                } else {
-                    router.push("/member/home");
-                }
+                toast.success("Password berhasil direset, silakan login");
+                router.push("/auth/login");
             }
         } catch (err) {
-            console.error("Fetch error:", err);
-            toast.error("Terjadi kesalahan server. Silakan coba lagi.");
+            console.error("Reset password error:", err);
+            toast.error("Terjadi kesalahan server");
         } finally {
             setIsLoading(false);
         }
@@ -89,23 +74,14 @@ const ResetPasswordForm = () => {
                     </div>
 
                     <form className="space-y-6" onSubmit={handleSubmit}>
-                        <InputField
-                            label="Email"
-                            name="email"
-                            type="email"
-                            placeholder="Enter your email"
-                            value={formData.email}
-                            onChange={handleInputChange}
-                            icon={Mail}
-                        />
 
                         <InputField
                             label="Password"
                             name="password"
                             type="password"
                             placeholder="Enter your password"
-                            value={formData.password}
-                            onChange={handleInputChange}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             icon={Lock}
                             showPassword={showPassword}
                             togglePassword={() => setShowPassword(!showPassword)}
@@ -116,11 +92,11 @@ const ResetPasswordForm = () => {
                             name="confirmPassword"
                             type="password"
                             placeholder="Confirm your password"
-                            value={formData.password}
-                            onChange={handleInputChange}
+                            value={password}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
                             icon={Lock}
-                            showPassword={showPassword}
-                            togglePassword={() => setShowPassword(!showPassword)}
+                            showPassword={showConfirmPassword}
+                            togglePassword={() => setShowConfirmPassword(!showConfirmPassword)}
                         />
 
                         <button
