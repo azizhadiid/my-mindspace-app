@@ -3,6 +3,10 @@
 import { useAuth } from "@/hooks/useAuth";
 import React from 'react'; // Penting untuk JSX
 
+// Component
+import HomeContentMember from "@/components/templates/member/home/HomeContent";
+import MainTemplateMember from "@/components/templates/member/MainTemplateMember";
+
 const HomePage = () => {
     const { user, loading } = useAuth("MEMBER");
 
@@ -13,7 +17,7 @@ const HomePage = () => {
                 <div
                     className="
                         w-12 h-12 rounded-full
-                        border-4 border-t-4 border-gray-200 border-t-blue-500
+                        border-4 border-t-4 border-gray-200 border-t-pink-500
                         animate-spin
                     "
                 ></div>
@@ -23,10 +27,9 @@ const HomePage = () => {
     }
 
     return (
-        <div className="p-4"> {/* Menambahkan padding agar tidak terlalu mepet */}
-            <h1 className="text-2xl font-bold mb-2">Ini Adalah Halaman Home bagi member</h1>
-            <p className="text-gray-700">Welcome, {user?.name || "Guest"}!</p>
-        </div>
+        <MainTemplateMember>
+            <HomeContentMember />
+        </MainTemplateMember>
     );
 };
 

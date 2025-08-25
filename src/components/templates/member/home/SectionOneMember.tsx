@@ -1,8 +1,10 @@
 'use client'
 
-import { Heart, Shield, Users } from 'lucide-react'
+import { Heart, Shield } from 'lucide-react'
+import { useAuth } from "@/hooks/useAuth";
 
-const SectionOne = () => {
+const SectionOneMember = () => {
+    const { user, loading } = useAuth("MEMBER");
     return (
         <section className="relative overflow-hidden pt-16 pb-20 lg:pt-24 lg:pb-28">
             {/* Background Elements */}
@@ -25,7 +27,7 @@ const SectionOne = () => {
 
                         {/* Main Heading */}
                         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6">
-                            <span className="text-gray-900">Your Journey to</span>
+                            <span className="text-gray-900">Welcome {user?.name || "Guest"} to</span>
                             <br />
                             <span className="bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">
                                 MindSpace
@@ -43,7 +45,7 @@ const SectionOne = () => {
                         {/* CTA Buttons */}
                         <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12">
                             <button className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-8 py-4 rounded-full hover:from-red-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl text-lg font-semibold">
-                                Start Free Consultation
+                                Start Consultation
                             </button>
                             <button className="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-full hover:border-pink-300 hover:text-pink-500 transition-all duration-300 text-lg font-semibold backdrop-blur-sm bg-white/50">
                                 Learn More
@@ -117,4 +119,4 @@ const SectionOne = () => {
     );
 };
 
-export default SectionOne;
+export default SectionOneMember;
