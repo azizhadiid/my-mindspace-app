@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { SparklesIcon, HeartIcon, ChatBubbleLeftRightIcon, AcademicCapIcon } from '@heroicons/react/24/solid';
+import { HeartIcon, ChatBubbleLeftRightIcon, AcademicCapIcon, ChatBubbleBottomCenterTextIcon } from '@heroicons/react/24/solid';
 
 const services = [
     {
@@ -15,9 +15,9 @@ const services = [
         description: 'Strengthen your relationships and improve communication with professional support for you and your loved ones.',
     },
     {
-        icon: SparklesIcon,
-        title: 'Mindfulness & Meditation',
-        description: 'Learn practices to reduce stress, improve focus, and cultivate inner peace with guided sessions.',
+        icon: ChatBubbleBottomCenterTextIcon,
+        title: 'AI Chat Assistant',
+        description: 'Talk to an empathetic AI companion to manage stress, navigate emotions, and find clarity in challenging moments.',
     },
     {
         icon: AcademicCapIcon,

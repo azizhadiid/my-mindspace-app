@@ -42,12 +42,12 @@ const NavbarLandingPage = () => {
 
                     {/* Desktop CTA Buttons */}
                     <div className="hidden md:flex items-center space-x-4">
-                        <button className="text-gray-700 hover:text-pink-500 transition-colors font-medium">
+                        <a className="text-gray-700 hover:text-pink-500 transition-colors font-medium" href='/auth/login'>
                             Sign In
-                        </button>
-                        <button className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-6 py-2 rounded-full hover:from-red-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        </a>
+                        <a className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-6 py-2 rounded-full hover:from-red-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl" href='/auth/register'>
                             Get Started
-                        </button>
+                        </a>
                     </div>
 
                     {/* Mobile Menu Button */}
@@ -81,12 +81,12 @@ const NavbarLandingPage = () => {
                                 Contact
                             </a>
                             <div className="flex flex-col space-y-2 pt-4 border-t border-rose-100">
-                                <button className="text-left text-gray-700 hover:text-pink-500 transition-colors font-medium">
+                                <a className="text-left text-gray-700 hover:text-pink-500 transition-colors font-medium" href='/auth/login'>
                                     Sign In
-                                </button>
-                                <button className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-6 py-2 rounded-full hover:from-red-600 hover:to-pink-600 transition-all duration-300 text-center">
+                                </a>
+                                <a className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-6 py-2 rounded-full hover:from-red-600 hover:to-pink-600 transition-all duration-300 text-center" href='/auth/register'>
                                     Get Started
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </div>

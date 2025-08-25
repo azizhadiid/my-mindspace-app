@@ -1,78 +1,276 @@
 'use client';
 
-import React from 'react';
-import { FaFacebook, FaInstagram, FaTwitter, FaLinkedin } from 'react-icons/fa'; // Pastikan Anda menginstal react-icons
+import React, { useState } from 'react';
+import {
+    Facebook,
+    Instagram,
+    Twitter,
+    Linkedin,
+    Mail,
+    Phone,
+    MapPin,
+    Heart,
+    Shield,
+    Award,
+    Users,
+    ArrowRight,
+    CheckCircle
+} from 'lucide-react';
+
+interface NewsletterData {
+    email: string;
+}
 
 const Footer = () => {
+    const [newsletterData, setNewsletterData] = useState<NewsletterData>({ email: '' });
+    const [isSubscribed, setIsSubscribed] = useState(false);
+
+    const handleNewsletterSubmit = () => {
+        if (newsletterData.email) {
+            setIsSubscribed(true);
+            setTimeout(() => {
+                setIsSubscribed(false);
+                setNewsletterData({ email: '' });
+            }, 3000);
+        }
+    };
+
+    const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setNewsletterData({ email: e.target.value });
+    };
+
+    const currentYear = new Date().getFullYear();
+
     return (
-        <footer className="bg-pink-500 text-white py-12 sm:py-16">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
-                    {/* Column 1: Brand & Description */}
-                    <div className="space-y-4">
-                        <h3 className="text-3xl font-bold text-white">Mindspace</h3>
-                        <p className="text-sm text-gray-200 leading-relaxed">
-                            Your personal haven for mental well-being. Confidential, compassionate, and professional guidance is just a tap away.
-                        </p>
-                        <div className="flex space-x-4">
-                            <a href="#" aria-label="Facebook" className="hover:text-pink-300 transition-colors duration-200">
-                                <FaFacebook className="h-6 w-6" />
-                            </a>
-                            <a href="#" aria-label="Instagram" className="hover:text-pink-300 transition-colors duration-200">
-                                <FaInstagram className="h-6 w-6" />
-                            </a>
-                            <a href="#" aria-label="Twitter" className="hover:text-pink-300 transition-colors duration-200">
-                                <FaTwitter className="h-6 w-6" />
-                            </a>
-                            <a href="#" aria-label="LinkedIn" className="hover:text-pink-300 transition-colors duration-200">
-                                <FaLinkedin className="h-6 w-6" />
-                            </a>
+        <footer className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white overflow-hidden">
+            {/* Background Elements */}
+            <div className="absolute inset-0 opacity-10">
+                <div className="absolute top-0 left-1/4 w-64 h-64 bg-gradient-to-r from-pink-500 to-red-500 rounded-full blur-3xl"></div>
+                <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-gradient-to-l from-red-500 to-pink-500 rounded-full blur-3xl"></div>
+            </div>
+
+            <div className="relative z-10">
+                {/* Main Footer Content */}
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
+
+                        {/* Brand & Description */}
+                        <div className="lg:col-span-2 space-y-6">
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-red-500 rounded-2xl flex items-center justify-center">
+                                    <Heart className="w-6 h-6 text-white fill-current" />
+                                </div>
+                                <h3 className="text-3xl sm:text-4xl font-black text-white">
+                                    Mind<span className="bg-gradient-to-r from-pink-500 to-red-500 bg-clip-text text-transparent">Space</span>
+                                </h3>
+                            </div>
+
+                            <p className="text-lg text-gray-300 leading-relaxed max-w-md">
+                                Your personal sanctuary for mental wellness. Experience confidential, compassionate, and professional guidance that fits your lifestyle.
+                            </p>
+
+                            {/* Trust Indicators */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="flex items-center gap-3 p-4 bg-white/5 rounded-2xl backdrop-blur-sm border border-gray-700/50">
+                                    <div className="w-10 h-10 bg-gradient-to-r from-pink-500/20 to-red-500/20 rounded-xl flex items-center justify-center">
+                                        <Shield className="w-5 h-5 text-pink-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-white">HIPAA Compliant</p>
+                                        <p className="text-xs text-gray-400">Secure & Private</p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-3 p-4 bg-white/5 rounded-2xl backdrop-blur-sm border border-gray-700/50">
+                                    <div className="w-10 h-10 bg-gradient-to-r from-pink-500/20 to-red-500/20 rounded-xl flex items-center justify-center">
+                                        <Award className="w-5 h-5 text-pink-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-white">Licensed Pros</p>
+                                        <p className="text-xs text-gray-400">Certified Therapists</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Social Media */}
+                            <div className="flex gap-4">
+                                <a
+                                    href="#"
+                                    className="group w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center hover:bg-gradient-to-r hover:from-pink-500 hover:to-red-500 transition-all duration-300"
+                                    aria-label="Facebook"
+                                >
+                                    <Facebook className="w-5 h-5 text-gray-300 group-hover:text-white transition-colors" />
+                                </a>
+                                <a
+                                    href="#"
+                                    className="group w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center hover:bg-gradient-to-r hover:from-pink-500 hover:to-red-500 transition-all duration-300"
+                                    aria-label="Instagram"
+                                >
+                                    <Instagram className="w-5 h-5 text-gray-300 group-hover:text-white transition-colors" />
+                                </a>
+                                <a
+                                    href="#"
+                                    className="group w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center hover:bg-gradient-to-r hover:from-pink-500 hover:to-red-500 transition-all duration-300"
+                                    aria-label="Twitter"
+                                >
+                                    <Twitter className="w-5 h-5 text-gray-300 group-hover:text-white transition-colors" />
+                                </a>
+                                <a
+                                    href="#"
+                                    className="group w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center hover:bg-gradient-to-r hover:from-pink-500 hover:to-red-500 transition-all duration-300"
+                                    aria-label="LinkedIn"
+                                >
+                                    <Linkedin className="w-5 h-5 text-gray-300 group-hover:text-white transition-colors" />
+                                </a>
+                            </div>
+                        </div>
+
+                        {/* Quick Links */}
+                        <div className="space-y-6">
+                            <h4 className="text-xl font-bold text-white flex items-center gap-2">
+                                <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
+                                Quick Links
+                            </h4>
+                            <ul className="space-y-3">
+                                {[
+                                    { name: 'About Us', href: '#about' },
+                                    { name: 'Services', href: '#services' },
+                                    { name: 'Our Therapists', href: '#therapists' },
+                                    { name: 'Contact', href: '#contact' },
+                                ].map((link) => (
+                                    <li key={link.name}>
+                                        <a
+                                            href={link.href}
+                                            className="group flex items-center gap-2 text-gray-300 hover:text-pink-400 transition-all duration-300"
+                                        >
+                                            <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                                            <span className="group-hover:translate-x-1 transition-transform duration-300">{link.name}</span>
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        {/* Contact & Legal */}
+                        <div className="space-y-8">
+                            {/* Contact Info */}
+                            <div className="space-y-6">
+                                <h4 className="text-xl font-bold text-white flex items-center gap-2">
+                                    <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
+                                    Get in Touch
+                                </h4>
+
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-3 text-gray-300">
+                                        <div className="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center">
+                                            <Phone className="w-4 h-4 text-pink-400" />
+                                        </div>
+                                        <a href="tel:+11234567890" className="hover:text-pink-400 transition-colors">
+                                            +1 (123) 456-7890
+                                        </a>
+                                    </div>
+
+                                    <div className="flex items-center gap-3 text-gray-300">
+                                        <div className="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center">
+                                            <Mail className="w-4 h-4 text-pink-400" />
+                                        </div>
+                                        <a href="mailto:support@mindspace.com" className="hover:text-pink-400 transition-colors">
+                                            support@mindspace.com
+                                        </a>
+                                    </div>
+
+                                    <div className="flex items-start gap-3 text-gray-300">
+                                        <div className="w-8 h-8 bg-white/10 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
+                                            <MapPin className="w-4 h-4 text-pink-400" />
+                                        </div>
+                                        <address className="not-italic leading-relaxed">
+                                            123 Wellness Street,<br />
+                                            Suite 456, Mindville<br />
+                                            MA 01234, USA
+                                        </address>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Legal Links */}
+                            <div className="space-y-4">
+                                <h5 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Legal</h5>
+                                <ul className="space-y-2">
+                                    {[
+                                        { name: 'Privacy Policy', href: '#privacy' },
+                                        { name: 'Terms of Service', href: '#terms' },
+                                        { name: 'HIPAA Notice', href: '#hipaa' },
+                                        { name: 'FAQ', href: '#faq' }
+                                    ].map((link) => (
+                                        <li key={link.name}>
+                                            <a
+                                                href={link.href}
+                                                className="text-sm text-gray-400 hover:text-pink-400 transition-colors duration-300"
+                                            >
+                                                {link.name}
+                                            </a>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Column 2: Quick Links */}
-                    <div>
-                        <h4 className="text-lg font-bold mb-4">Quick Links</h4>
-                        <ul className="space-y-2 text-sm">
-                            <li><a href="#about" className="hover:text-pink-300 transition-colors duration-200">About Us</a></li>
-                            <li><a href="#services" className="hover:text-pink-300 transition-colors duration-200">Services</a></li>
-                            <li><a href="#therapists" className="hover:text-pink-300 transition-colors duration-200">Our Therapists</a></li>
-                            <li><a href="#contact" className="hover:text-pink-300 transition-colors duration-200">Contact</a></li>
-                        </ul>
-                    </div>
+                    {/* Newsletter Section */}
+                    <div className="mt-16 pt-12 border-t border-gray-700/50">
+                        <div className="max-w-2xl mx-auto text-center">
+                            <div className="flex items-center justify-center gap-2 mb-4">
+                                <Users className="w-6 h-6 text-pink-500" />
+                                <h4 className="text-2xl font-bold text-white">Stay Connected</h4>
+                            </div>
 
-                    {/* Column 3: Legal */}
-                    <div>
-                        <h4 className="text-lg font-bold mb-4">Legal</h4>
-                        <ul className="space-y-2 text-sm">
-                            <li><a href="#" className="hover:text-pink-300 transition-colors duration-200">Privacy Policy</a></li>
-                            <li><a href="#" className="hover:text-pink-300 transition-colors duration-200">Terms of Service</a></li>
-                            <li><a href="#" className="hover:text-pink-300 transition-colors duration-200">FAQ</a></li>
-                        </ul>
-                    </div>
+                            <p className="text-gray-300 mb-8">
+                                Join our community and receive weekly insights, tips, and resources for better mental health.
+                            </p>
 
-                    {/* Column 4: Newsletter (optional, bisa dihilangkan) */}
-                    <div>
-                        <h4 className="text-lg font-bold mb-4">Stay Connected</h4>
-                        <p className="text-sm text-gray-200">Subscribe to our newsletter for updates and tips on mental wellness.</p>
-                        <form className="mt-4 flex">
-                            <input
-                                type="email"
-                                placeholder="Your email address"
-                                className="w-full p-3 rounded-l-md text-gray-900 border-none outline-none"
-                            />
-                            <button
-                                type="submit"
-                                className="bg-pink-500 text-white p-3 rounded-r-md hover:bg-red-500 transition-colors duration-200"
-                            >
-                                Join
-                            </button>
-                        </form>
+                            {isSubscribed ? (
+                                <div className="flex items-center justify-center gap-3 p-4 bg-green-500/20 rounded-2xl border border-green-500/30">
+                                    <CheckCircle className="w-6 h-6 text-green-400" />
+                                    <span className="text-green-400 font-medium">Thank you for subscribing!</span>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+                                    <input
+                                        type="email"
+                                        value={newsletterData.email}
+                                        onChange={handleEmailChange}
+                                        placeholder="Enter your email address"
+                                        className="flex-1 px-6 py-4 bg-white/10 border border-gray-600 rounded-2xl text-white placeholder-gray-400 focus:border-pink-500 focus:bg-white/20 transition-all duration-300 backdrop-blur-sm"
+                                    />
+                                    <button
+                                        onClick={handleNewsletterSubmit}
+                                        className="group px-8 py-4 bg-gradient-to-r from-pink-500 to-red-500 rounded-2xl font-semibold text-white hover:from-pink-600 hover:to-red-600 transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2"
+                                    >
+                                        <span>Subscribe</span>
+                                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
 
-                <div className="mt-12 text-center text-sm text-gray-300 border-t border-red-500 pt-8">
-                    &copy; {new Date().getFullYear()} Mindspace. All rights reserved.
+                {/* Bottom Bar */}
+                <div className="border-t border-gray-700/50 bg-black/20 backdrop-blur-sm">
+                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+                        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <p className="text-sm text-gray-400">
+                                &copy; {currentYear} MindSpace. All rights reserved. Made with ❤️ for mental wellness.
+                            </p>
+                            <div className="flex items-center gap-6 text-sm text-gray-400">
+                                <span className="flex items-center gap-2">
+                                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                                    24/7 Support Available
+                                </span>
+                                <span>Licensed & Insured</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </footer>
