@@ -1,7 +1,7 @@
 'use client'
 
 import { useAuth } from "@/hooks/useAuth";
-import React from 'react'; // Penting untuk JSX
+import React from 'react';
 
 // Component
 import MainTemplateMember from "@/components/templates/member/MainTemplateMember";
@@ -16,10 +16,10 @@ const AccountMemberPage = () => {
                 {/* Spinner */}
                 <div
                     className="
-                        w-12 h-12 rounded-full
-                        border-4 border-t-4 border-gray-200 border-t-pink-500
-                        animate-spin
-                    "
+                            w-12 h-12 rounded-full
+                            border-4 border-t-4 border-gray-200 border-t-pink-500
+                            animate-spin
+                        "
                 ></div>
                 <p className="mt-4 text-lg text-gray-700">Loading...</p>
             </div>
