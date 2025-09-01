@@ -3,41 +3,47 @@
 import { useState } from 'react'
 import { Menu, X, Brain } from 'lucide-react'
 
-const NavbarLandingPage = () => {
-    const [isMenuOpen, setIsMenuOpen] = useState(false)
+interface NavbarLandingPageProps {
+    activeSection: string;
+}
+
+const NavbarLandingPage = ({ activeSection }: NavbarLandingPageProps) => {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    // Helper function to apply active styles
+    const getLinkClasses = (sectionId: string, isMobile: boolean) => {
+        const baseClasses = isMobile
+            ? "block px-3 py-2 text-base font-medium transition-colors"
+            : "text-gray-700 hover:text-pink-500 transition-colors font-medium";
+
+        const activeClasses = isMobile
+            ? "bg-pink-100 text-pink-600 rounded-lg"
+            : "text-pink-500 font-bold";
+
+        return `${baseClasses} ${activeSection === sectionId ? activeClasses : ''}`;
+    };
 
     return (
         <nav className="relative bg-white/80 backdrop-blur-lg border-b border-rose-100 sticky top-0 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
                     {/* Logo */}
-                    <div className="flex items-center space-x-2">
+                    <a href='/' className="flex items-center space-x-2">
                         <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-pink-500 rounded-lg flex items-center justify-center">
                             <Brain className="w-5 h-5 text-white" />
                         </div>
                         <span className="text-xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">
                             MindSpace
                         </span>
-                    </div>
+                    </a>
 
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center space-x-8">
-                        <a href="/" className="text-gray-700 hover:text-pink-500 transition-colors font-medium">
-                            Home
-                        </a>
-                        <a href="#about" className="text-gray-700 hover:text-pink-500 transition-colors font-medium">
-                            About
-                        </a>
-                        <a href="#services" className="text-gray-700 hover:text-pink-500 transition-colors font-medium">
-                            Services
-                        </a>
-                        <a href="#therapists" className="text-gray-700 hover:text-pink-500 transition-colors font-medium">
-                            Therapists
-                        </a>
-
-                        <a href="#contact" className="text-gray-700 hover:text-pink-500 transition-colors font-medium">
-                            Contact
-                        </a>
+                        <a href="#hero" className={getLinkClasses('hero', false)}>Home</a>
+                        <a href="#about" className={getLinkClasses('about', false)}>About</a>
+                        <a href="#services" className={getLinkClasses('services', false)}>Services</a>
+                        <a href="#therapists" className={getLinkClasses('therapists', false)}>Therapists</a>
+                        <a href="#contact" className={getLinkClasses('contact', false)}>Contact</a>
                     </div>
 
                     {/* Desktop CTA Buttons */}
@@ -65,19 +71,39 @@ const NavbarLandingPage = () => {
                 {isMenuOpen && (
                     <div className="md:hidden absolute top-16 left-0 right-0 bg-white/95 backdrop-blur-lg border-b border-rose-100 shadow-lg">
                         <div className="px-4 py-4 space-y-4">
-                            <a href="/" className="block text-gray-700 hover:text-pink-500 transition-colors font-medium">
+                            <a
+                                href="#hero"
+                                onClick={() => setIsMenuOpen(false)}
+                                className={getLinkClasses('hero', true)}
+                            >
                                 Home
                             </a>
-                            <a href="#services" className="block text-gray-700 hover:text-pink-500 transition-colors font-medium">
-                                Services
-                            </a>
-                            <a href="#therapists" className="block text-gray-700 hover:text-pink-500 transition-colors font-medium">
-                                Therapists
-                            </a>
-                            <a href="#about" className="block text-gray-700 hover:text-pink-500 transition-colors font-medium">
+                            <a
+                                href="#about"
+                                onClick={() => setIsMenuOpen(false)}
+                                className={getLinkClasses('about', true)}
+                            >
                                 About
                             </a>
-                            <a href="#contact" className="block text-gray-700 hover:text-pink-500 transition-colors font-medium">
+                            <a
+                                href="#services"
+                                onClick={() => setIsMenuOpen(false)}
+                                className={getLinkClasses('services', true)}
+                            >
+                                Services
+                            </a>
+                            <a
+                                href="#therapists"
+                                onClick={() => setIsMenuOpen(false)}
+                                className={getLinkClasses('therapists', true)}
+                            >
+                                Therapists
+                            </a>
+                            <a
+                                href="#contact"
+                                onClick={() => setIsMenuOpen(false)}
+                                className={getLinkClasses('contact', true)}
+                            >
                                 Contact
                             </a>
                             <div className="flex flex-col space-y-2 pt-4 border-t border-rose-100">
