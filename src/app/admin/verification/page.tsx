@@ -2,8 +2,8 @@
 
 import AdminLayout from '@/components/templates/admin/MainTemplateAdmin';
 import Sidebar from '@/components/templates/admin/SideBar';
+import VerificationContent from '@/components/templates/admin/verification/VerificationContent';
 import React, { useState } from 'react';
-import PlaceholderContent from '@/components/templates/admin/Dashboard/PlaceholderContent';
 
 const VerifikasiKonsultasiPagae = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -17,7 +17,7 @@ const VerifikasiKonsultasiPagae = () => {
             <AdminLayout
                 setSidebarOpen={setSidebarOpen}
             >
-                <PlaceholderContent title="Verifikasi Konsultasi" description="Review dan verifikasi sesi konsultasi untuk memastikan kualitas layanan." />
+                <VerificationContent />
             </AdminLayout>
         </div>
     );

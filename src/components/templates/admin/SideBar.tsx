@@ -25,7 +25,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard', href: '/admin/dashboard' },
         { id: 'add-article', icon: Plus, label: 'Tambah Artikel', href: '/admin/article/add' },
         { id: 'edit-article', icon: Edit, label: 'Edit Artikel', href: '/admin/article/edit' }, // Mengarahkan ke halaman daftar artikel
-        { id: 'psychologist-data', icon: Users, label: 'Data Psikolog', href: '/admin/psikolog' }, // Mengarahkan ke halaman daftar psikolog
         { id: 'chat', icon: MessageCircle, label: 'Chat', href: '/admin/chat' },
         { id: 'verify-consultation', icon: CheckCircle, label: 'Verifikasi Konsultasi', href: '/admin/verification' },
     ];
