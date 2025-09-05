@@ -6,14 +6,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from "react-hot-toast";
 import BrainCharacter from '../animation/brainCharacter';
 import InputField from '../form/input';
-
-
-// Define interfaces for form data
-interface IFormData {
-    email: string;
-    password: string;
-    rememberMe: boolean;
-}
+import type { IFormData } from '@/types/login';
 
 const LoginForm = () => {
     const router = useRouter();
@@ -45,15 +38,11 @@ const LoginForm = () => {
             if (!res.ok) {
                 toast.error(data.error || "Login failed");
             } else {
-                toast.success("Login successful!");
-
                 // Cek role dan redirect
                 if (data.role === "ADMIN") {
                     router.push("/admin/dashboard");
                 } else if (data.role === "MEMBER") {
                     router.push("/member/home");
-                } else if (data.role === "PSIKOLOG") {
-                    router.push("/psikolog/home");
                 } else {
                     router.push("/"); // fallback
                 }

@@ -1,35 +1,33 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import jwt from "jsonwebtoken";
+// file: middleware.ts
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
+export function middleware(request: NextRequest) {
+    const userRole = request.cookies.get('userRole')?.value;
+    const { pathname } = request.nextUrl;
 
-export function middleware(req: NextRequest) {
-    const token = req.cookies.get("token")?.value;
-    if (!token) {
-        return NextResponse.redirect(new URL("/auth/login", req.url));
+    // Tentukan rute yang dilindungi
+    const adminRoutes = ['/admin'];
+    const memberRoutes = ['/member'];
+
+    // Cek jika rute yang diakses adalah halaman admin
+    if (adminRoutes.some(route => pathname.startsWith(route))) {
+        if (userRole !== 'ADMIN') {
+            return NextResponse.redirect(new URL('/auth/login', request.url));
+        }
     }
 
-    try {
-        const decoded = jwt.verify(token, JWT_SECRET) as { role: string };
-
-        // Atur akses sesuai role
-        if (req.nextUrl.pathname.startsWith("/admin") && decoded.role !== "ADMIN") {
-            return NextResponse.redirect(new URL("/auth/login", req.url));
+    // Cek jika rute yang diakses adalah halaman member
+    if (memberRoutes.some(route => pathname.startsWith(route))) {
+        if (userRole !== 'MEMBER') {
+            return NextResponse.redirect(new URL('/auth/login', request.url));
         }
-        if (req.nextUrl.pathname.startsWith("/member") && decoded.role !== "MEMBER") {
-            return NextResponse.redirect(new URL("/auth/login", req.url));
-        }
-        if (req.nextUrl.pathname.startsWith("/psikolog") && decoded.role !== "PSIKOLOG") {
-            return NextResponse.redirect(new URL("/auth/login", req.url));
-        }
-
-        return NextResponse.next();
-    } catch (error) {
-        return NextResponse.redirect(new URL("/auth/login", req.url));
     }
+
+    return NextResponse.next();
 }
 
+// Tentukan rute mana saja yang harus melewati middleware
 export const config = {
-    matcher: ["/admin/:path*", "/member/:path*", "/psikolog/:path*"],
+    matcher: ['/member/:path*', '/admin/:path*'],
 };
