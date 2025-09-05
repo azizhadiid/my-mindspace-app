@@ -5,21 +5,8 @@ import { User, Mail, Lock, ArrowRight } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import BrainCharacter from '../animation/brainCharacter';
 import InputField from '../form/input';
+import type { IFormData, IFormErrors } from '@/types/register';
 
-// Define interfaces for form data and errors
-interface IFormData {
-    name: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
-}
-
-interface IFormErrors {
-    name?: string;
-    email?: string;
-    password?: string;
-    confirmPassword?: string;
-}
 
 const RegistrationForm = () => {
     const [formData, setFormData] = useState<IFormData>({
@@ -76,7 +63,10 @@ const RegistrationForm = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!validateForm()) return;
+        if (!validateForm()) {
+            toast.error('Please check your form again.');
+            return;
+        }
 
         setIsLoading(true);
 
@@ -101,6 +91,8 @@ const RegistrationForm = () => {
                 toast.success("Registration successful! Please sign in.");
                 // Clear form state and show success message
                 setFormData({ name: '', email: '', password: '', confirmPassword: '' });
+                // Opsional: Redirect ke halaman login atau dashboard
+                window.location.href = '/auth/login';
             }
         } catch (err) {
             toast.error("An error occurred while registering. Please try again.");

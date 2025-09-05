@@ -1,12 +1,11 @@
 'use client'
 
-import React, { useState } from 'react';
+import React from 'react';
 import WelcomePanel from '@/components/ui/welcomePanel';
 import RegistrationForm from '@/components/auth/registerForm';
 
 const RegisterPage = () => {
     // State for showing the success modal, managed at the page level
-    const [showSuccess, setShowSuccess] = useState<boolean>(false);
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-orange-100 via-pink-50 to-purple-100 relative overflow-hidden font-sans">
