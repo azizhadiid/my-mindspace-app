@@ -7,7 +7,6 @@ import { toast } from "react-hot-toast";
 import BrainCharacter from '../animation/brainCharacter';
 import InputField from '../form/input';
 
-
 const ForgotPasswordForm = () => {
     const [email, setEmail] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -16,24 +15,35 @@ const ForgotPasswordForm = () => {
         e.preventDefault();
         setIsLoading(true);
 
+        // 1. Validasi email sederhana di sisi klien
+        if (!email.trim()) {
+            toast.error("Email is required.");
+            setIsLoading(false);
+            return;
+        }
+
         try {
-            const res = await fetch("/api/auth/forgot-password", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
+            // 2. Kirim email ke API forgot-password
+            const res = await fetch('/api/auth/forgot-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 body: JSON.stringify({ email }),
             });
 
             const data = await res.json();
 
-            if (!res.ok) {
-                toast.error(data.error || "Email is not found");
+            // 3. Tampilkan pesan berhasil dari server
+            if (res.ok) {
+                toast.success(data.message);
+                setEmail(""); // Kosongkan input setelah berhasil
             } else {
-                toast.success("Password reset link sent to email!");
-                setEmail("");
+                toast.error(data.message || 'Failed to process the request.');
             }
-        } catch (err) {
-            console.error("Forgot password error:", err);
-            toast.error("internal server error");
+        } catch (error) {
+            console.error('Error while sending form:', error);
+            toast.error('An error occurred on the server.');
         } finally {
             setIsLoading(false);
         }
