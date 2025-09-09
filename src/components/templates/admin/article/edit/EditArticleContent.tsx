@@ -9,16 +9,7 @@ import Swal from 'sweetalert2';
 import ArtikelTable from "./ArtikelTable";
 import PaginationControls from "./PaginationControls ";
 import SearchAndFilter from "./SearchAndFilter";
-
-// Define the Artikel type to avoid TS errors
-interface Artikel {
-    id: string; // Menggunakan string sesuai Prisma
-    title: string; // Menggunakan title sesuai Prisma
-    category: string;
-    publishDate: string; // Tetap string karena akan diparsing Date di frontend
-    image: string; // Menggunakan image sesuai Prisma
-    // Add other fields as needed
-}
+import type { Artikel } from "@/types/article";
 
 // Hapus DUMMY_ARTIKELS karena kita akan fetch dari API
 
