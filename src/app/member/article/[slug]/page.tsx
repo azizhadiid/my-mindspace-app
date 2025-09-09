@@ -10,7 +10,7 @@ const articles = [
         title: 'Understanding Anxiety: A Guide to Managing Your Worries',
         summary: 'Anxiety is a common mental health condition. Learn how to identify its symptoms and discover effective coping strategies to regain control of your life.',
         category: 'Mental Health',
-        imageUrl: 'https://images.unsplash.com/photo-1549419130-10493874313f?q=80&w=2070&auto=format&fit=crop',
+        imageUrl: '/uploads/article/ai2.jpg',
         content: `
             <p>Anxiety is a feeling of unease, such as worry or fear, that can be mild or severe. Everyone has feelings of anxiety at some point in their life, but for some, it can be a constant presence. This article explores the different types of anxiety disorders and provides actionable steps for managing your worries.</p>
             <p><strong>What is Anxiety?</strong></p>
@@ -50,7 +50,7 @@ const articles = [
         title: 'Mindfulness for Beginners: Simple Steps to a Calmer Mind',
         summary: 'Discover the power of mindfulness. This article provides easy-to-follow exercises to help you stay present and reduce stress in your daily routine.',
         category: 'Mindfulness',
-        imageUrl: 'https://images.unsplash.com/photo-1554524859-679951662916?q=80&w=2070&auto=format&fit=crop',
+        imageUrl: '/uploads/article/pexels-fauxels-3184416.jpg',
         content: `
             <p>Mindfulness is the practice of purposely focusing your attention on the present moment—and accepting it without judgment. This article outlines simple exercises, such as the 5-4-3-2-1 grounding technique, to help you get started. Incorporating mindfulness into your daily routine, even for just a few minutes, can significantly reduce stress and improve your overall well-being. It’s about training your mind to be present, which helps you better handle life’s challenges.</p>
             <p><strong>What is Mindfulness?</strong></p>
@@ -110,7 +110,7 @@ export default function ArticlePage({ params }: { params: { slug: string } }) {
                 {/* Back to Articles Button */}
                 <div className="mb-8">
                     <Link
-                        href="/articles"
+                        href="/member/article"
                         className="inline-flex items-center text-pink-600 hover:text-red-600 transition-colors duration-200 font-medium group"
                     >
                         <svg className="h-5 w-5 mr-2 -translate-x-1 group-hover:-translate-x-0.5 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
