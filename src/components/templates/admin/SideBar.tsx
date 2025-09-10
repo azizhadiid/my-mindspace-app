@@ -31,10 +31,20 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
 
     // Fungsi untuk menentukan item mana yang aktif, bahkan untuk path nested (misal /admin/article/123)
     const isLinkActive = (href: string) => {
-        if (href === '/admin/article') {
-            return pathname.startsWith('/admin/article');
+        // 1. Cek kecocokan path secara eksak terlebih dahulu.
+        if (pathname === href) {
+            return true;
         }
-        return pathname === href;
+
+        // 2. Kemudian, tangani kasus path bersarang.
+        // Tambahkan kondisi khusus untuk 'edit'
+        if (href === '/admin/article/edit') {
+            return pathname.startsWith('/admin/article/edit');
+        }
+
+        // 3. Logika umum untuk path lainnya (misal: /admin/dashboard, /admin/chat)
+        // Cek apakah pathname dimulai dengan href, kecuali untuk homepage '/'
+        return pathname.startsWith(href) && href !== '/';
     };
 
     return (
