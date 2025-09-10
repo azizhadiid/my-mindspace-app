@@ -20,11 +20,17 @@ const AddArticleContent = () => {
 
     // Categories for the select field
     const categories = [
-        { value: "Kesehatan Mental", label: "Kesehatan Mental" },
-        { value: "Hidup Sehat Tahun 2025", label: "Hidup Sehat Tahun 2025" },
-        { value: "Dampak Digital Terhadap Mental", label: "Dampak Digital Terhadap Mental" },
-        { value: "Sosial Media dan Kesehatan Mental", label: "Sosial Media dan Kesehatan Mental" },
+        { value: "Mental Health", label: "Mental Health" },
+        { value: "Healthy Living in 2025", label: "Healthy Living in 2025" },
+        { value: "Digital Impact on Mental Health", label: "Digital Impact on Mental Health" },
+        { value: "Social Media and Mental Health", label: "Social Media and Mental Health" },
+        { value: "Work-Life Balance in the Digital Era", label: "Work-Life Balance in the Digital Era" },
+        { value: "Mindfulness and Stress Management", label: "Mindfulness and Stress Management" },
+        { value: "Youth Mental Health Awareness", label: "Youth Mental Health Awareness" },
+        { value: "Online Privacy and Emotional Wellbeing", label: "Online Privacy and Emotional Wellbeing" },
+        { value: "Mental Health Support for Students", label: "Mental Health Support for Students" }
     ];
+
 
     // Logika handleImageChange
     const handleImageChange = (file: File | null) => {
@@ -97,17 +103,16 @@ const AddArticleContent = () => {
     return (
         <div className="space-y-6">
             <div className="container mx-auto px-4 py-2">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Tambah Artikel Baru</h1>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Add New Article</h1>
 
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 md:p-10">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        {/* Kolom Kiri: Judul dan Konten */}
                         <div className="lg:col-span-2 space-y-6">
                             <InputField
                                 id="title"
-                                label="Judul Artikel"
+                                label="Article Title"
                                 type="text"
-                                placeholder="Masukkan judul artikel..."
+                                placeholder="Enter the article title..."
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
                                 required
@@ -115,21 +120,23 @@ const AddArticleContent = () => {
 
                             <TextAreaField
                                 id="content"
-                                label="Konten Artikel"
-                                placeholder="Tulis konten artikel di sini..."
+                                label="Article Content"
+                                placeholder="Write the article content here..."
                                 value={content}
                                 onChange={(e) => setContent(e.target.value)}
                                 rows={15}
                                 required
                             />
-                            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Gunakan editor ini untuk memformat teks, menambahkan gambar, atau video.</p>
+                            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                                Use this editor to format text, add images, or embed videos.
+                            </p>
                         </div>
 
                         {/* Kolom Kanan: Pengaturan Artikel */}
                         <div className="lg:col-span-1 space-y-6">
                             <SelectField
                                 id="category"
-                                label="Kategori"
+                                label="Category"
                                 value={category}
                                 onChange={(e) => setCategory(e.target.value)}
                                 options={categories}
@@ -138,7 +145,7 @@ const AddArticleContent = () => {
 
                             <InputField
                                 id="publish-date"
-                                label="Tanggal Publish"
+                                label="Publish Date"
                                 type="date"
                                 value={date}
                                 onChange={(e) => setDate(e.target.value)}
@@ -147,7 +154,7 @@ const AddArticleContent = () => {
 
                             <ImageUploadField
                                 id="featured-image"
-                                label="Gambar Unggulan"
+                                label="Featured Image"
                                 onFileChange={handleImageChange}
                                 previewUrl={imagePreview}
                                 required
@@ -161,7 +168,7 @@ const AddArticleContent = () => {
                             onClick={handleSubmit}
                             loading={loading}
                         >
-                            Publikasikan Artikel
+                            Publish Article
                         </SubmitButton>
                     </div>
                 </div>

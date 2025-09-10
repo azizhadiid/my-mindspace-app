@@ -43,10 +43,10 @@ const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
                             </svg>
                         )}
                         <div className="flex text-sm text-gray-600 dark:text-gray-400">
-                            <p className="pl-1">Drag and drop atau</p>
-                            <span className="font-semibold text-pink-500 hover:text-fuchsia-600 ml-1">Unggah file</span>
+                            <p className="pl-1">Drag and drop ors</p>
+                            <span className="font-semibold text-pink-500 hover:text-fuchsia-600 ml-1">Upload File</span>
                         </div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, GIF hingga 10MB</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">PNG, JPG, GIF until 10MB</p>
                     </div>
                     <input
                         id={id}

@@ -38,10 +38,10 @@ export async function POST(req: Request) {
             },
         });
 
-        return NextResponse.json({ message: "Artikel berhasil ditambahkan", article });
+        return NextResponse.json({ message: "Article successfully added", article });
     } catch (error) {
         console.error(error);
-        return NextResponse.json({ error: "Terjadi kesalahan" }, { status: 500 });
+        return NextResponse.json({ error: "There is an error" }, { status: 500 });
     }
 }
 

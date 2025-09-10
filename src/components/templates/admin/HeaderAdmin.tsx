@@ -16,7 +16,7 @@ const HeaderAdmin: React.FC<HeaderProps> = ({ setSidebarOpen }) => {
     // Namun untuk kasus ini, saya akan mendefinisikan ulang agar Header bisa mandiri
     const menuItems: MenuItem[] = [
         { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard', href: '/admin/dashboard' },
-        { id: 'add-article', icon: Plus, label: 'Tambah Artikel', href: '/admin/article/add' },
+        { id: 'add-article', icon: Plus, label: 'Add Article', href: '/admin/article/add' },
         { id: 'edit-article', icon: Edit, label: 'Edit Artikel', href: '/admin/article/edit' },
         { id: 'chat', icon: MessageCircle, label: 'Chat', href: '/admin/chat' },
         { id: 'verify-consultation', icon: CheckCircle, label: 'Verifikasi Konsul', href: '/admin/verification' },
