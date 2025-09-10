@@ -4,77 +4,62 @@
 import React from 'react';
 import Image from 'next/image';
 import { Trash2, Edit } from 'lucide-react';
-
-// Make sure to define this type or import it from a shared file
-interface Artikel {
-    id: string; // Menggunakan string sesuai Prisma
-    title: string; // Menggunakan title sesuai Prisma
-    category: string;
-    publishDate: string; // Tetap string karena akan diparsing Date di frontend
-    image?: string; // Menggunakan image sesuai Prisma, opsional karena bisa saja tidak ada
-    // Add other fields as needed
-}
-
-interface ArtikelTableProps {
-    artikels: Artikel[];
-    onEdit: (artikelId: string) => void; // Mengubah tipe id menjadi string
-    onDelete: (artikelId: string) => void; // Mengubah tipe id menjadi string
-    deletingId: string | null; // Mengubah tipe id menjadi string
-}
+import type { ArtikelTableProps } from '@/types/article';
 
 const ArtikelTable: React.FC<ArtikelTableProps> = ({ artikels, onEdit, onDelete, deletingId }) => {
     return (
         <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <table className="min-w-full lg:min-w-[900px] divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className="bg-gray-50 dark:bg-gray-700">
                     <tr>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300 w-16">
                             ID
                         </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                            Judul
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300 w-64">
+                            Title
                         </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                            Kategori
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300 w-40">
+                            Category
                         </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                            Tanggal Publish
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300 w-40">
+                            Publish Date
                         </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                            Gambar
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300 w-24">
+                            Image
                         </th>
-                        <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                            Aksi
+                        <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300 w-32">
+                            Actions
                         </th>
                     </tr>
+
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
                     {artikels.map((artikel) => (
                         <tr key={artikel.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                {artikel.id.substring(0, 8)}... {/* Tampilkan sebagian ID untuk kerapian */}
+                                {artikel.id.substring(0, 8)}...
                             </td>
-                            <td className="px-6 py-4 max-w-xs truncate text-sm text-gray-800 dark:text-gray-200">
-                                {artikel.title} {/* Menggunakan artikel.title */}
+                            <td className="px-6 py-4 whitespace-normal text-sm text-gray-800 dark:text-gray-200">
+                                {artikel.title}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
                                 {artikel.category}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
-                                {new Date(artikel.publishDate).toLocaleDateString('id-ID')} {/* Menggunakan artikel.publishDate */}
+                                {new Date(artikel.publishDate).toLocaleDateString('id-ID')}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-gray-200">
                                 {artikel.image ? (
                                     <Image
-                                        src={artikel.image} // Menggunakan artikel.image
-                                        alt={artikel.title} // Menggunakan artikel.title
+                                        src={artikel.image}
+                                        alt={artikel.title}
                                         width={48}
                                         height={48}
                                         className="h-12 w-12 object-cover rounded-md border border-gray-200 dark:border-gray-600 shadow-sm"
                                         unoptimized
                                     />
                                 ) : (
-                                    <span className="text-gray-400">Tidak ada gambar</span>
+                                    <span className="text-gray-400">No picture</span>
                                 )}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -99,7 +84,7 @@ const ArtikelTable: React.FC<ArtikelTableProps> = ({ artikels, onEdit, onDelete,
                                         ) : (
                                             <Trash2 className="w-4 h-4 mr-1" />
                                         )}
-                                        {deletingId === artikel.id ? 'Menghapus...' : 'Hapus'}
+                                        {deletingId === artikel.id ? 'Delete...' : 'Delete'}
                                     </button>
                                 </div>
                             </td>

@@ -24,7 +24,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
     const menuItems: MenuItem[] = [
         { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard', href: '/admin/dashboard' },
         { id: 'add-article', icon: Plus, label: 'Add Article', href: '/admin/article/add' },
-        { id: 'edit-article', icon: Edit, label: 'Edit Artikel', href: '/admin/article/edit' }, // Mengarahkan ke halaman daftar artikel
+        { id: 'edit-article', icon: Edit, label: 'Edit Article', href: '/admin/article/edit' }, // Mengarahkan ke halaman daftar artikel
         { id: 'chat', icon: MessageCircle, label: 'Chat', href: '/admin/chat' },
         { id: 'verify-consultation', icon: CheckCircle, label: 'Verifikasi Konsultasi', href: '/admin/verification' },
     ];

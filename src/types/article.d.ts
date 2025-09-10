@@ -7,6 +7,13 @@ export interface Artikel {
     // Add other fields as needed
 }
 
+export interface ArtikelTableProps {
+    artikels: Artikel[];
+    onEdit: (artikelId: string) => void; // Mengubah tipe id menjadi string
+    onDelete: (artikelId: string) => void; // Mengubah tipe id menjadi string
+    deletingId: string | null; // Mengubah tipe id menjadi string
+}
+
 export interface InputFieldProps {
     id: string;
     label: string;

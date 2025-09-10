@@ -42,7 +42,7 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
     return (
         <div className="flex flex-col md:flex-row items-center justify-between mt-8 space-y-4 md:space-y-0">
             <div className="text-sm text-gray-700 dark:text-gray-300">
-                Menampilkan {startIndex} sampai {endIndex} dari {totalItems} artikel
+                Displays {startIndex} to {endIndex} of {totalItems} articles
             </div>
             <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
                 <button

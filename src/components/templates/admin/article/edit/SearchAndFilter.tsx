@@ -23,7 +23,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
             <div className="relative w-full md:w-1/2">
                 <input
                     type="text"
-                    placeholder="Cari artikel (judul, kategori)..."
+                    placeholder="Search for articles (title, category)..."
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                     value={searchTerm}
                     onChange={onSearchChange}
@@ -32,7 +32,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-5 h-5" />
             </div>
             <div className="flex items-center space-x-2">
-                <label htmlFor="perPage" className="text-gray-700 dark:text-gray-300 text-sm font-medium">Tampilkan:</label>
+                <label htmlFor="perPage" className="text-gray-700 dark:text-gray-300 text-sm font-medium">Show:</label>
                 <select
                     id="perPage"
                     value={perPage}
@@ -45,7 +45,7 @@ const SearchAndFilter: React.FC<SearchAndFilterProps> = ({
                     <option value="25">25</option>
                     <option value="50">50</option>
                 </select>
-                <span className="text-gray-700 dark:text-gray-300 text-sm">per halaman</span>
+                <span className="text-gray-700 dark:text-gray-300 text-sm">per page</span>
             </div>
         </div>
     );
