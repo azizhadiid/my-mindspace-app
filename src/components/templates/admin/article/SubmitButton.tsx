@@ -1,13 +1,7 @@
 'use client'
 
+import type { SubmitButtonProps } from '@/types/article';
 import React from 'react';
-
-interface SubmitButtonProps {
-    children: React.ReactNode;
-    loading: boolean;
-    onClick: () => void;
-    className?: string;
-}
 
 const SubmitButton: React.FC<SubmitButtonProps> = ({
     children,

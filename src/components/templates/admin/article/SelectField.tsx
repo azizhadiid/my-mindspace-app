@@ -1,22 +1,9 @@
 'use client'
 
+import type { SelectFieldProps } from '@/types/article';
 import React from 'react';
 
-interface SelectOption {
-    value: string;
-    label: string;
-}
 
-interface SelectFieldProps {
-    id: string;
-    label: string;
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-    options: SelectOption[];
-    required?: boolean;
-    className?: string;
-    disabled?: boolean;
-}
 
 const SelectField: React.FC<SelectFieldProps> = ({
     id,

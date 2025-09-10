@@ -2,16 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-
-interface ImageUploadFieldProps {
-    id: string;
-    label: string;
-    onFileChange: (file: File | null) => void;
-    previewUrl: string | null;
-    required?: boolean;
-    className?: string;
-    disabled?: boolean;
-}
+import type { ImageUploadFieldProps } from '@/types/article';
 
 const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
     id,

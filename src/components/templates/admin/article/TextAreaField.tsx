@@ -1,18 +1,7 @@
 'use client'
 
+import type { TextAreaFieldProps } from '@/types/article';
 import React from 'react';
-
-interface TextAreaFieldProps {
-    id: string;
-    label: string;
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-    placeholder?: string;
-    rows?: number;
-    required?: boolean;
-    className?: string;
-    disabled?: boolean;
-}
 
 const TextAreaField: React.FC<TextAreaFieldProps> = ({
     id,

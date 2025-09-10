@@ -66,12 +66,12 @@ const AddArticleContent = () => {
             });
 
             const data = await res.json();
-            if (!res.ok) throw new Error(data.error || "Gagal menambahkan artikel");
+            if (!res.ok) throw new Error(data.error || "Failed to add article");
 
             // Alert sukses
             Swal.fire({
                 icon: "success",
-                title: "Artikel berhasil diupload!",
+                title: "Article successfully uploaded!",
                 showConfirmButton: false,
                 timer: 1500,
             });
@@ -86,7 +86,7 @@ const AddArticleContent = () => {
         } catch (err: any) {
             Swal.fire({
                 icon: "error",
-                title: "Gagal",
+                title: "Failed",
                 text: err.message,
             });
         } finally {

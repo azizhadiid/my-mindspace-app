@@ -1,18 +1,7 @@
 'use client'
 
+import type { InputFieldProps } from '@/types/article';
 import React from 'react';
-
-interface InputFieldProps {
-    id: string;
-    label: string;
-    type: React.HTMLInputTypeAttribute;
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    placeholder?: string;
-    required?: boolean;
-    className?: string;
-    disabled?: boolean;
-}
 
 const InputField: React.FC<InputFieldProps> = ({
     id,
