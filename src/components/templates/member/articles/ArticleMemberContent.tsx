@@ -26,7 +26,7 @@ export default function ArticleMemberContent() {
             category,
         });
 
-        const res = await fetch(`/api/articles?${params.toString()}`);
+        const res = await fetch(`/api/member/article?${params.toString()}`);
         const data = await res.json();
         setArticles(data.articles); // <-- penting: ambil array, bukan data langsung
     };
@@ -52,7 +52,7 @@ export default function ArticleMemberContent() {
                                 title: article.title,
                                 summary: article.content.slice(0, 120) + "...",
                                 category: article.category,
-                                imageUrl: article.image,
+                                imageUrl: article.image, // Sesuaikan path gambar
                             }}
                         />
                     ))
@@ -85,7 +85,6 @@ export default function ArticleMemberContent() {
                             Reset Search
                         </button>
                     </div>
-
                 )}
             </div>
         </div>

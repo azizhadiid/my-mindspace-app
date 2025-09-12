@@ -10,13 +10,7 @@ interface Article {
     imageUrl: string;
 }
 
-const slugify = (title: string): string => {
-    return title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
-};
-
 const CardArticle = ({ article }: { article: Article }) => {
-    const slug = slugify(article.title);
-
     return (
         <div className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-rose-100">
             <div className="relative w-full h-48">
@@ -39,7 +33,7 @@ const CardArticle = ({ article }: { article: Article }) => {
                     {article.summary}
                 </p>
                 <Link
-                    href={`/member/article/${slug}`}
+                    href={`/member/article/${article.id}`}
                     className="inline-block text-pink-600 font-semibold hover:underline transition-colors"
                 >
                     Read more →
