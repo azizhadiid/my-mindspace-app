@@ -13,6 +13,7 @@
     "@prisma/client": "^6.15.0",
     "@tailwindcss/typography": "^0.5.16",
     "bcryptjs": "^3.0.2",
+    "framer-motion": "^12.23.12",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.539.0",
     "next": "15.4.6",
