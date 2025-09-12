@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react';
-import { Mail, Lock, ArrowRight } from 'lucide-react';
+import { Lock, ArrowRight } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from "react-hot-toast";
 import BrainCharacter from '../animation/brainCharacter';
@@ -9,7 +9,7 @@ import InputField from '../form/input';
 
 const ResetPasswordForm = () => {
     const params = useSearchParams();
-    const token = params.get("token"); // token dari link email
+    const token = params.get("token");
     const router = useRouter();
 
     const [password, setPassword] = useState("");
@@ -22,11 +22,11 @@ const ResetPasswordForm = () => {
         e.preventDefault();
 
         if (!token) {
-            toast.error("Token tidak valid!");
+            toast.error("Token is invalid!");
             return;
         }
         if (password !== confirmPassword) {
-            toast.error("Password tidak sama!");
+            toast.error("Passwords are not the same!");
             return;
         }
 
@@ -41,14 +41,14 @@ const ResetPasswordForm = () => {
             const data = await res.json();
 
             if (!res.ok) {
-                toast.error(data.error || "Gagal reset password");
+                toast.error(data.error || "Password reset failed");
             } else {
-                toast.success("Password berhasil direset, silakan login");
+                toast.success("Password reset successfully, please login");
                 router.push("/auth/login");
             }
         } catch (err) {
             console.error("Reset password error:", err);
-            toast.error("Terjadi kesalahan server");
+            toast.error("A server error occurred");
         } finally {
             setIsLoading(false);
         }
@@ -74,7 +74,6 @@ const ResetPasswordForm = () => {
                     </div>
 
                     <form className="space-y-6" onSubmit={handleSubmit}>
-
                         <InputField
                             label="Password"
                             name="password"
@@ -92,7 +91,7 @@ const ResetPasswordForm = () => {
                             name="confirmPassword"
                             type="password"
                             placeholder="Confirm your password"
-                            value={password}
+                            value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             icon={Lock}
                             showPassword={showConfirmPassword}
@@ -114,36 +113,6 @@ const ResetPasswordForm = () => {
                             )}
                         </button>
                     </form>
-
-                    <div className="mt-8 text-center">
-                        <p className="text-gray-600">
-                            Don't have an account?{' '}
-                            <a
-                                href="/auth/register"
-                                className="text-pink-500 hover:text-pink-600 font-semibold hover:underline transition-colors"
-                            >
-                                Sign up here
-                            </a>
-                        </p>
-                        <p className="text-gray-600">
-                            Have an account?{' '}
-                            <a
-                                href="/auth/login"
-                                className="text-pink-500 hover:text-pink-600 font-semibold hover:underline transition-colors"
-                            >
-                                Sign in here
-                            </a>
-                        </p>
-                    </div>
-
-                    <div className="mt-6 text-center">
-                        <p className="text-xs text-gray-500">
-                            By creating an account, you agree to our{' '}
-                            <a href="/terms" className="text-pink-500 hover:underline">Terms of Service</a>
-                            {' '}and{' '}
-                            <a href="/privacy" className="text-pink-500 hover:underline">Privacy Policy</a>
-                        </p>
-                    </div>
                 </div>
             </div>
         </div>

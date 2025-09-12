@@ -32,7 +32,7 @@ export async function POST(request: Request) {
         });
 
         // Kirim email berisi tautan reset
-        const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/reset-password?token=${token}`;
+        const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/resetPassword?token=${token}`;
         const emailHtml = `
             <p>Halo,</p>
             <p>Kami menerima permintaan untuk mereset password akun Anda. Silakan klik tautan di bawah ini untuk melanjutkan:</p>
