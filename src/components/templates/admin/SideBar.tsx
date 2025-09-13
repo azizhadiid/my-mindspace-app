@@ -26,7 +26,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         { id: 'add-article', icon: Plus, label: 'Add Article', href: '/admin/article/add' },
         { id: 'edit-article', icon: Edit, label: 'Edit Article', href: '/admin/article/edit' }, // Mengarahkan ke halaman daftar artikel
         { id: 'chat', icon: MessageCircle, label: 'Chat', href: '/admin/chat' },
-        { id: 'verify-consultation', icon: CheckCircle, label: 'Verifikasi Konsultasi', href: '/admin/verification' },
+        { id: 'verify-consultation', icon: CheckCircle, label: 'Verification Consultation', href: '/admin/verification' },
     ];
 
     // Fungsi untuk menentukan item mana yang aktif, bahkan untuk path nested (misal /admin/article/123)

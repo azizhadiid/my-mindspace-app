@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useMemo } from 'react';
-import { Search, ChevronLeft, ChevronRight, Check, X } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, Check, X, Trash } from 'lucide-react';
 
 // Data dummy untuk simulasi
 const dummyUsers = [
@@ -47,6 +47,12 @@ const VerificationContent = () => {
         );
     };
 
+    const handleDelete = (id: string, name: string) => {
+        if (window.confirm(`Are you sure you want to delete ${name}'s verification request? This action cannot be undone.`)) {
+            setUsers(prevUsers => prevUsers.filter(user => user.id !== id));
+        }
+    };
+
     const getStatusClasses = (status: string) => {
         switch (status) {
             case 'Pending':
@@ -80,8 +86,8 @@ const VerificationContent = () => {
             </div>
 
             {/* Verification Table */}
-            <div className="overflow-x-auto min-h-[400px]">
-                <table className="min-w-full divide-y divide-gray-200 border-collapse">
+            <div className="overflow-x-auto md:overflow-x-visible min-h-[400px] pb-2">
+                <table className="min-w-max w-full divide-y divide-gray-200 border-collapse">
                     <thead className="bg-gray-50/70 sticky top-0">
                         <tr>
                             <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Name</th>
@@ -121,6 +127,13 @@ const VerificationContent = () => {
                                             >
                                                 <X className="w-5 h-5" />
                                             </button>
+                                            <button
+                                                onClick={() => handleDelete(user.id, user.name)}
+                                                className="p-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                                                title="Delete"
+                                            >
+                                                <Trash className="w-5 h-5" />
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -137,7 +150,7 @@ const VerificationContent = () => {
             </div>
 
             {/* Pagination */}
-            <div className="flex items-center justify-between mt-6">
+            <div className="flex flex-col md:flex-row items-center justify-between mt-6 gap-4">
                 <span className="text-sm text-gray-600">
                     Showing {paginatedUsers.length} of {filteredUsers.length} results
                 </span>

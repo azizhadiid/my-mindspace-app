@@ -19,7 +19,7 @@ const HeaderAdmin: React.FC<HeaderProps> = ({ setSidebarOpen }) => {
         { id: 'add-article', icon: Plus, label: 'Add Article', href: '/admin/article/add' },
         { id: 'edit-article', icon: Edit, label: 'Edit Article', href: '/admin/article/edit' },
         { id: 'chat', icon: MessageCircle, label: 'Chat', href: '/admin/chat' },
-        { id: 'verify-consultation', icon: CheckCircle, label: 'Verifikasi Konsul', href: '/admin/verification' },
+        { id: 'verify-consultation', icon: CheckCircle, label: 'Verification Consultation', href: '/admin/verification' },
     ];
 
     const getPageTitle = () => {
