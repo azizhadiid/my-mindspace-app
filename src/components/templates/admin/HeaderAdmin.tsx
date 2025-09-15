@@ -4,6 +4,8 @@ import React from 'react';
 import { Menu, Bell, Search, LogOut, LayoutDashboard, Plus, Edit, CheckCircle, Users, MessageCircle } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { MenuItem } from './SideBar';
+import { useLogout } from '@/lib/logout';
+import Swal from "sweetalert2";
 
 interface HeaderProps {
     setSidebarOpen: (isOpen: boolean) => void;
@@ -11,6 +13,7 @@ interface HeaderProps {
 
 const HeaderAdmin: React.FC<HeaderProps> = ({ setSidebarOpen }) => {
     const pathname = usePathname();
+    const { logout } = useLogout();
 
     // Definisikan ulang menuItems di sini atau impor dari file terpisah jika perlu
     // Namun untuk kasus ini, saya akan mendefinisikan ulang agar Header bisa mandiri
@@ -27,6 +30,28 @@ const HeaderAdmin: React.FC<HeaderProps> = ({ setSidebarOpen }) => {
         return item ? item.label : 'Dashboard';
     };
 
+    const handleLogout = async () => {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You will be logged out from this session.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, log out!"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await logout();
+                    Swal.fire("Logged out!", "You have been logged out successfully.", "success");
+                } catch (error) {
+                    console.error("Logout error:", error);
+                    Swal.fire("Failed!", "An error occurred while logging out.", "error");
+                }
+            }
+        });
+    };
+
     return (
         <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 px-6 py-4 sticky top-0 z-30">
             <div className="flex items-center justify-between">
@@ -41,7 +66,7 @@ const HeaderAdmin: React.FC<HeaderProps> = ({ setSidebarOpen }) => {
                 </div>
 
                 <div className="flex items-center space-x-4">
-                    <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                    <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg" onClick={handleLogout}>
                         <LogOut className="w-5 h-5" />
                     </button>
                 </div>
