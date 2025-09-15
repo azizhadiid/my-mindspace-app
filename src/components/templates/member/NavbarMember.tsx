@@ -4,10 +4,13 @@ import { useState } from 'react'
 import { Menu, X, Brain } from 'lucide-react'
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import Swal from 'sweetalert2';
+import { useLogout } from '@/lib/logout';
 
 const NavabrMember = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const pathname = usePathname();
+    const { logout } = useLogout();
 
     // Fungsi pembantu yang lebih modular untuk kelas CSS
     const getLinkClasses = (href: string, isMobile: boolean) => {
@@ -23,6 +26,28 @@ const NavabrMember = () => {
 
         // Cek apakah pathname saat ini cocok dengan href
         return `${baseClasses} ${pathname === href ? activeClasses : 'hover:bg-gray-50'}`;
+    };
+
+    const handleLogout = async () => {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You will be logged out from this session.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, log out!"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await logout();
+                    Swal.fire("Logged out!", "You have been logged out successfully.", "success");
+                } catch (error) {
+                    console.error("Logout error:", error);
+                    Swal.fire("Failed!", "An error occurred while logging out.", "error");
+                }
+            }
+        });
     };
 
     return (
@@ -79,9 +104,9 @@ const NavabrMember = () => {
                         <Link className={getLinkClasses("/member/account", false)} href='/member/account'>
                             Account
                         </Link>
-                        <Link className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-6 py-2 rounded-full hover:from-red-600 hover:to-pink-600 transition-all duration-300" href='/auth/logout'>
+                        <button className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-6 py-2 rounded-full hover:from-red-600 hover:to-pink-600 transition-all duration-300" onClick={handleLogout}>
                             Logout
-                        </Link>
+                        </button>
                     </div>
                 </div>
 
@@ -98,7 +123,7 @@ const NavabrMember = () => {
                             <Link href="/member/mindbot" onClick={() => setIsMenuOpen(false)} className={getLinkClasses("/member/mindbot", true)}>Mindbot</Link>
                             <div className="flex flex-col space-y-2 pt-4 border-t border-rose-100 mt-4">
                                 <Link className={getLinkClasses("/member/account", true)} href='/member/account'>Account</Link>
-                                <Link className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-6 py-2 rounded-full hover:from-red-600 hover:to-pink-600 transition-all duration-300 text-center" href='/auth/logout'>Logout</Link>
+                                <button className="bg-gradient-to-r from-red-500 to-pink-500 text-white px-6 py-2 rounded-full hover:from-red-600 hover:to-pink-600 transition-all duration-300 text-center" onClick={handleLogout} >Logout</button>
                             </div>
                         </div>
                     </div>
