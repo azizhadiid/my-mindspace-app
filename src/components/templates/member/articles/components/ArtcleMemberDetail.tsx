@@ -1,41 +1,43 @@
-// components/templates/member/articles/ArticleMemberDetail.tsx
-
 'use client'
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { notFound } from 'next/navigation';
+import type { Artikel } from '@/types/article';
 
 interface ArticleMemberDetailProps {
     articleId: string;
 }
 
 const ArticleMemberDetail: React.FC<ArticleMemberDetailProps> = ({ articleId }) => {
-    const [article, setArticle] = useState<any>(null);
+    const [article, setArticle] = useState<Artikel | null>(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchArticle = async () => {
-            setLoading(true);
             try {
-                const res = await fetch(`/api/member/article/${articleId}`);
-                if (!res.ok) {
-                    throw new Error("Failed to fetch article");
+                const response = await fetch(`/api/articles/${articleId}`);
+                if (response.status === 404) {
+                    // Gunakan notFound() untuk menampilkan halaman 404 Next.js
+                    notFound();
                 }
-                const data = await res.json();
-                setArticle(data.article);
-            } catch (error) {
-                console.error("Error fetching article:", error);
-                setArticle(null); // Atur artikel menjadi null saat terjadi error
+                if (!response.ok) {
+                    throw new Error('Failed to fetch article data');
+                }
+                const data: Artikel = await response.json();
+                setArticle(data);
+            } catch (err: any) {
+                setError(err.message);
+                console.error("Error fetching article:", err);
             } finally {
                 setLoading(false);
             }
         };
 
-        if (articleId) {
-            fetchArticle();
-        }
-    }, [articleId]);
+        fetchArticle();
+    }, [articleId]); // Dependency array
 
     if (loading) {
         return (

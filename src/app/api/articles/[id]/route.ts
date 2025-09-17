@@ -7,23 +7,27 @@ import path from "path";
 export const runtime = "nodejs";
 
 // GET handler to fetch a single article by ID
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(
+    req: Request,
+    context: { params: { id: string } } // Mengubah params menjadi bagian dari objek context
+) {
     try {
-        const articleId = params.id;
+        // Ambil id dari params dengan cara yang disarankan Next.js
+        const { id } = context.params;
 
         const article = await prisma.article.findUnique({
-            where: { id: articleId },
+            where: { id: id },
             include: { author: { select: { name: true } } } // Opsional: include author name
         });
 
         if (!article) {
-            return NextResponse.json({ error: "Artikel tidak ditemukan" }, { status: 404 });
+            return NextResponse.json({ error: "Article not found" }, { status: 404 });
         }
 
         return NextResponse.json(article);
     } catch (error) {
         console.error("Error fetching single article:", error);
-        return NextResponse.json({ error: "Terjadi kesalahan saat mengambil artikel" }, { status: 500 });
+        return NextResponse.json({ error: "An error occurred while retrieving the article" }, { status: 500 });
     }
 }
 

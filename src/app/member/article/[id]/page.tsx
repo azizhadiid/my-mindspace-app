@@ -1,18 +1,17 @@
-'use client'
-
+// app/member/article/[id]/page.tsx
 import React from 'react';
 import MainTemplateMember from "@/components/templates/member/MainTemplateMember";
 import ArticleMemberDetail from '@/components/templates/member/articles/components/ArtcleMemberDetail';
 
 interface ArticleDetailPageProps {
     params: {
-        slug: string;
+        id: string;
     };
 }
 
 const ArticleDetailPage = ({ params }: ArticleDetailPageProps) => {
-    // Parameter slug dari URL akan secara otomatis menjadi articleId
-    const articleId = React.use(Promise.resolve(params)).slug;
+    // Parameter 'id' dari URL akan otomatis diambil oleh Next.js 13+
+    const articleId = params.id;
 
     return (
         <MainTemplateMember>
