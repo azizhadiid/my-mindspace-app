@@ -1,5 +1,5 @@
 // components/forms/EditProfileForm.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
 interface EditProfileFormProps {
@@ -7,9 +7,38 @@ interface EditProfileFormProps {
 }
 
 const EditProfileForm: React.FC<EditProfileFormProps> = ({ onClose }) => {
+    // 2. Buat state untuk menyimpan URL preview foto
+    const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+
+    // 3. Handler untuk mengelola perubahan pada input file
+    const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            // Buat URL sementara dari file yang dipilih
+            const newPreviewUrl = URL.createObjectURL(file);
+
+            // Hapus URL lama jika ada untuk mencegah memory leak sebelum set yang baru
+            if (photoPreview) {
+                URL.revokeObjectURL(photoPreview);
+            }
+
+            setPhotoPreview(newPreviewUrl);
+        }
+    };
+
+    // Efek untuk membersihkan URL objek saat komponen unmount
+    useEffect(() => {
+        return () => {
+            if (photoPreview) {
+                URL.revokeObjectURL(photoPreview);
+            }
+        };
+    }, [photoPreview]);
+
 
     const handleSubmit = (e: React.FormEvent) => {
-
+        e.preventDefault();
+        // Logika untuk submit form
     };
 
     return (
@@ -26,6 +55,34 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({ onClose }) => {
 
             <div className="max-h-[70vh] overflow-y-auto pr-2">
                 <form onSubmit={handleSubmit} className="space-y-5">
+                    {/* Photo Profile */}
+                    <div>
+                        <label htmlFor="photoProfile" className="block text-sm font-medium text-gray-700 mb-1">
+                            Photo Profile
+                        </label>
+
+                        {/* 4. Tampilkan preview foto jika ada */}
+                        {photoPreview && (
+                            <div className="mt-4 mb-4 flex justify-center">
+                                <img
+                                    src={photoPreview}
+                                    alt="Photo Preview"
+                                    className="w-32 h-32 rounded-full object-cover border-4 border-pink-200 shadow-md"
+                                />
+                            </div>
+                        )}
+
+
+                        <input
+                            type="file"
+                            id="photoProfile"
+                            accept="image/*" // Filter agar hanya file gambar yang bisa dipilih
+                            onChange={handlePhotoChange} // 5. Tambahkan event handler onChange
+                            className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-pink-50 file:text-pink-700 hover:file:bg-pink-100"
+                        />
+                    </div>
+
+                    {/* Full Name */}
                     <div>
                         <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
                             Full Name
@@ -35,7 +92,7 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({ onClose }) => {
                             id="name"
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all"
                             placeholder="Enter Your Full Name"
-                            required
+
                         />
                     </div>
 
@@ -49,7 +106,7 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({ onClose }) => {
                             id="phone"
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all"
                             placeholder="Enter your phone number"
-                            required
+
                         />
                     </div>
 
@@ -62,7 +119,7 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({ onClose }) => {
                             type="date"
                             id="dob"
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all"
-                            required
+
                         />
                     </div>
 
@@ -74,7 +131,7 @@ const EditProfileForm: React.FC<EditProfileFormProps> = ({ onClose }) => {
                         <select
                             id="gender"
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all"
-                            required
+
                         >
                             <option value="">Select your gender</option>
                             <option value="male">Male</option>
