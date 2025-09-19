@@ -15,8 +15,30 @@ model User {
   role               Role                 @default(MEMBER)
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
+  memberProfile      MemberProfile?
   Article            Article[]
   PasswordResetToken PasswordResetToken[]
+}
+
+// --- Tambahkan Model MemberProfile BARU di sini ---
+model MemberProfile {
+  id                       String                  @id @default(cuid())
+  photoProfile             String? // URL atau path ke foto profil
+  phoneNumber              String?                 @unique // Bisa dibuat unik jika perlu
+  dateOfBirth              DateTime?
+  gender                   Gender?
+  consultationPreference   ConsultationPreference?
+  consultationPurpose      String?
+  mentalHealthHistory      String?                 @db.Text // Gunakan tipe Text untuk isian panjang
+  relatedMedicalConditions String?
+  urgencyLevel             UrgencyLevel?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Kunci relasi one-to-one dengan User
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique // @unique di sini memastikan relasi one-to-one
 }
 
 model PasswordResetToken {
@@ -45,4 +67,22 @@ enum Role {
   ADMIN
   MEMBER
   PSIKOLOG
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  PREFER_NOT_SAY
+}
+
+enum ConsultationPreference {
+  ONLINE
+  IN_PERSON
+  NO_PREFERENCE
+}
+
+enum UrgencyLevel {
+  LOW
+  MEDIUM
+  HIGH
 }
