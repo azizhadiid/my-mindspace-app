@@ -1,18 +1,62 @@
 // components/forms/ChangePasswordForm.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import { X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 interface ChangePasswordFormProps {
     onClose: () => void;
 }
 
 const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ onClose }) => {
-    const handleSubmit = (e: React.FormEvent) => {
+    const router = useRouter();
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmNewPassword, setConfirmNewPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Logika untuk mengganti kata sandi
-        console.log("Mengganti kata sandi...");
-        alert("Kata sandi berhasil diperbarui!"); // Contoh notifikasi
-        onClose(); // Tutup form setelah submit
+        setIsLoading(true);
+
+        // Validasi frontend sederhana
+        if (newPassword !== confirmNewPassword) {
+            toast.error("New passwords do not match.");
+            setIsLoading(false);
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/member/change-password', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    currentPassword,
+                    newPassword,
+                    confirmNewPassword,
+                }),
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                // Tampilkan pesan error dari backend
+                toast.error(result.message || 'Something went wrong.');
+            } else {
+                // Tampilkan pesan sukses dari backend
+                toast.success(result.message || 'Password updated successfully!');
+                onClose(); // Tutup modal
+                router.refresh(); // Refresh halaman untuk memastikan data terbaru
+            }
+
+        } catch (error) {
+            console.error('Failed to change password:', error);
+            toast.error('An unexpected error occurred. Please try again.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -36,6 +80,8 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ onClose }) => {
                         <input
                             type="password"
                             id="currentPassword"
+                            value={currentPassword}
+                            onChange={(e) => setCurrentPassword(e.target.value)}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all"
                             placeholder="Enter the current password"
                             required
@@ -48,6 +94,8 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ onClose }) => {
                         <input
                             type="password"
                             id="newPassword"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all"
                             placeholder="Enter new password"
                             required
@@ -60,6 +108,8 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ onClose }) => {
                         <input
                             type="password"
                             id="confirmNewPassword"
+                            value={confirmNewPassword}
+                            onChange={(e) => setConfirmNewPassword(e.target.value)}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-transparent transition-all"
                             placeholder="Confirm new password"
                             required
@@ -67,9 +117,10 @@ const ChangePasswordForm: React.FC<ChangePasswordFormProps> = ({ onClose }) => {
                     </div>
                     <button
                         type="submit"
+                        disabled={isLoading}
                         className="w-full bg-gradient-to-r from-red-500 to-pink-500 text-white px-6 py-3 rounded-full hover:from-red-600 hover:to-pink-600 transition-all duration-300 font-semibold"
                     >
-                        Save Changes
+                        {isLoading ? 'Saving...' : 'Save Changes'}
                     </button>
                 </form>
             </div>

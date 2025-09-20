@@ -24,8 +24,8 @@ export default function RootLayout({
       <body
         className={poppins.className}
       >
-        {children}
         <Toaster position="top-right" reverseOrder={false} />
+        {children}
       </body>
     </html>
   );
