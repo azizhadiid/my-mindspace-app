@@ -11,7 +11,10 @@ export function useAuth(requiredRole?: "ADMIN" | "MEMBER" | "PSIKOLOG") {
     useEffect(() => {
         const checkAuth = async () => {
             try {
-                const res = await fetch("/api/me", { method: "GET" });
+                const res = await fetch("/api/me", {
+                    method: "GET",
+                    cache: "no-store", // 🚀 hindari cache
+                });
                 if (!res.ok) {
                     router.push("/auth/login");
                     return;
@@ -22,7 +25,7 @@ export function useAuth(requiredRole?: "ADMIN" | "MEMBER" | "PSIKOLOG") {
 
                 // Kalau halaman ini butuh role tertentu
                 if (requiredRole && data.role !== requiredRole) {
-                    router.push("/auth/login");
+                    router.push("/unauthorized"); // 🚀 halaman khusus forbidden
                     return;
                 }
             } catch (err) {
