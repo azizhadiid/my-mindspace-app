@@ -18,6 +18,24 @@ model User {
   memberProfile      MemberProfile?
   Article            Article[]
   PasswordResetToken PasswordResetToken[]
+  Consultation       Consultation[]
+}
+
+model Consultation {
+  id            String   @id @default(cuid())
+  userId        String
+  name_psikolog String
+  type          String // bisa 'video' | 'chat' | 'phone'
+  date          DateTime
+  main_topic    String
+  description   String?
+  urgency       String // 'low' | 'medium' | 'high'
+  status        String   @default("pending") // pending, confirmed, cancelled
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relasi
+  user User @relation(fields: [userId], references: [id])
 }
 
 // --- Tambahkan Model MemberProfile BARU di sini ---
