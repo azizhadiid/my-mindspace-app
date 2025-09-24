@@ -24,8 +24,12 @@ const NavabrMember = () => {
             ? "bg-pink-100 text-pink-600 font-bold"
             : "text-pink-500 font-bold";
 
+        // Cek aktif bukan hanya exact match, tapi juga sub-route
+        const isActive =
+            pathname === href || pathname.startsWith(href + "/");
+
         // Cek apakah pathname saat ini cocok dengan href
-        return `${baseClasses} ${pathname === href ? activeClasses : 'hover:bg-gray-50'}`;
+        return `${baseClasses} ${isActive ? activeClasses : 'hover:bg-gray-50'}`;
     };
 
     const handleLogout = async () => {
