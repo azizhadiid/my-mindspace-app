@@ -88,7 +88,6 @@ const ConsultationPage = () => {
             verified: true
         }
     ];
-    
 
     const handleBookConsultation = (psychologist: Psychologist) => {
         setSelectedPsychologist(psychologist);
