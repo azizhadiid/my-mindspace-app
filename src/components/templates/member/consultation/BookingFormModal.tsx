@@ -77,7 +77,7 @@ const BookingFormModal: React.FC<BookingFormModalProps> = ({
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="w-full max-w-2xl">
-                <div className="bg-white rounded-3xl p-8 flex flex-col max-h-[90vh] overflow-hidden">
+                <form onSubmit={handleSubmit} className="bg-white rounded-3xl p-8 flex flex-col max-h-[90vh] overflow-hidden">
                     {/* Header (fixed at the top) */}
                     <div className="flex items-center justify-between mb-8">
                         <div>
@@ -93,7 +93,7 @@ const BookingFormModal: React.FC<BookingFormModalProps> = ({
 
                     {/* Scrollable Content */}
                     <div className="flex-1 overflow-y-auto pr-2">
-                        <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="space-y-6">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">Name of Psychologist</label>
                                 <input
@@ -204,7 +204,7 @@ const BookingFormModal: React.FC<BookingFormModalProps> = ({
                                     ))}
                                 </div>
                             </div>
-                        </form>
+                        </div>
                     </div>
                     {/* Submit Button (fixed at the bottom) */}
                     <div className="flex gap-4 pt-6">
@@ -222,7 +222,7 @@ const BookingFormModal: React.FC<BookingFormModalProps> = ({
                             Book Consultation - {selectedPsychologist.price}
                         </button>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     );

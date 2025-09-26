@@ -12,6 +12,7 @@ import WhyChooseUsSection from "@/components/templates/member/consultation/WhyCh
 import CTASection from "@/components/templates/member/consultation/CTASection";
 import BookingFormModal from "@/components/templates/member/consultation/BookingFormModal";
 import HeroSection from "@/components/templates/member/consultation/HeroSection";
+import toast from "react-hot-toast";
 
 interface Psychologist {
     id: string;
@@ -90,17 +91,58 @@ const ConsultationPage = () => {
     ];
 
     const handleBookConsultation = (psychologist: Psychologist) => {
+        // Cek jika user belum login
+        if (!user) {
+            toast.error("You must be logged in to book a consultation.");
+            // Optional: redirect ke halaman login
+            // window.push('/login');
+            return;
+        }
         setSelectedPsychologist(psychologist);
         setFormData(prev => ({ ...prev, psychologistId: psychologist.id }));
         setShowBookingForm(true);
     };
 
-    const handleSubmitBooking = (e: React.FormEvent) => {
+    const handleSubmitBooking = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Booking submitted:', formData);
-        alert('Konsultasi berhasil dijadwalkan! Kami akan mengirimkan konfirmasi melalui email.');
-        setShowBookingForm(false);
-        setSelectedPsychologist(null);
+
+        // Tambahan: Pastikan selectedPsychologist tidak null
+        if (!selectedPsychologist) {
+            toast.error("An error occurred. Please select a psychologist again.");
+            return;
+        }
+
+        try {
+            const res = await fetch("/api/member/consultations", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                // 👇 PERUBAHAN DI SINI: Sertakan nama psikolog
+                body: JSON.stringify({
+                    ...formData,
+                    psychologistName: selectedPsychologist.name
+                }),
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Failed to book consultation");
+
+            toast.success("Consultation successfully scheduled!");
+            setShowBookingForm(false);
+            setSelectedPsychologist(null);
+            // Reset form jika perlu
+            setFormData({
+                psychologistId: '',
+                date: '',
+                time: '',
+                type: 'video',
+                topic: '',
+                description: '',
+                urgency: 'medium'
+            });
+
+        } catch (err: any) {
+            toast.error(err.message);
+        }
     };
 
     if (loading) {
