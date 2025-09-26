@@ -70,7 +70,7 @@ const VerificationContent = () => {
         <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 md:p-8 shadow-2xl border border-gray-100/50">
             {/* Header & Search */}
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
-                <h2 className="text-xl md:text-2xl font-bold text-gray-800 flex-1">Verification Requests</h2>
+                <h2 className="text-xl md:text-2xl font-bold text-gray-800 flex-1 text-center md:text-left">Verification Requests</h2>
                 <div className="relative w-full md:w-auto">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <Search className="h-5 w-5 text-gray-400" />
@@ -85,69 +85,84 @@ const VerificationContent = () => {
                 </div>
             </div>
 
-            {/* Verification Table */}
-            <div className="overflow-x-auto md:overflow-x-visible min-h-[400px] pb-2">
-                <table className="min-w-max w-full divide-y divide-gray-200 border-collapse">
-                    <thead className="bg-gray-50/70 sticky top-0">
-                        <tr>
-                            <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Name</th>
-                            <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email</th>
-                            <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Submitted</th>
-                            <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
-                            <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white/50 divide-y divide-gray-200">
-                        {paginatedUsers.length > 0 ? (
-                            paginatedUsers.map((user) => (
-                                <tr key={user.id} className="hover:bg-gray-50 transition-colors">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.name}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{user.email}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{user.date}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClasses(user.status)}`}>
-                                            {user.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <div className="flex justify-end space-x-2">
-                                            <button
-                                                onClick={() => handleAction(user.id, 'Verified')}
-                                                className="p-2 text-green-600 hover:bg-green-100 rounded-full transition-colors"
-                                                title="Verify"
-                                                disabled={user.status !== 'Pending'}
-                                            >
-                                                <Check className="w-5 h-5" />
-                                            </button>
-                                            <button
-                                                onClick={() => handleAction(user.id, 'Rejected')}
-                                                className="p-2 text-red-600 hover:bg-red-100 rounded-full transition-colors"
-                                                title="Reject"
-                                                disabled={user.status !== 'Pending'}
-                                            >
-                                                <X className="w-5 h-5" />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(user.id, user.name)}
-                                                className="p-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-                                                title="Delete"
-                                            >
-                                                <Trash className="w-5 h-5" />
-                                            </button>
-                                        </div>
+            {/* --- Container untuk Tabel dan Kartu --- */}
+            <div className="min-h-[400px]">
+                {/* Tampilan Tabel untuk Desktop (Hidden on mobile) */}
+                <div className="overflow-x-auto hidden md:block">
+                    <table className="min-w-full w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50/70">
+                            <tr>
+                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Name</th>
+                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email</th>
+                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Submitted</th>
+                                <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                                <th scope="col" className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white/50 divide-y divide-gray-200">
+                            {paginatedUsers.length > 0 ? (
+                                paginatedUsers.map((user) => (
+                                    <tr key={user.id} className="hover:bg-gray-50 transition-colors">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{user.name}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{user.email}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{user.date}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClasses(user.status)}`}>
+                                                {user.status}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <div className="flex justify-end space-x-2">
+                                                {/* Action Buttons */}
+                                                <button onClick={() => handleAction(user.id, 'Verified')} className="p-2 text-green-600 hover:bg-green-100 rounded-full transition-colors" title="Verify" disabled={user.status !== 'Pending'}> <Check className="w-5 h-5" /> </button>
+                                                <button onClick={() => handleAction(user.id, 'Rejected')} className="p-2 text-red-600 hover:bg-red-100 rounded-full transition-colors" title="Reject" disabled={user.status !== 'Pending'}> <X className="w-5 h-5" /> </button>
+                                                <button onClick={() => handleDelete(user.id, user.name)} className="p-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors" title="Delete"> <Trash className="w-5 h-5" /> </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan={5} className="py-10 text-center text-gray-500">
+                                        No users found matching your search.
                                     </td>
                                 </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan={5} className="py-10 text-center text-gray-500">
-                                    No users found matching your search.
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* Tampilan Kartu untuk Mobile (Hidden on medium+ screens) */}
+                <div className="grid grid-cols-1 gap-4 md:hidden">
+                    {paginatedUsers.length > 0 ? (
+                        paginatedUsers.map((user) => (
+                            <div key={user.id} className="bg-white/70 p-4 rounded-xl shadow-md border border-gray-100 space-y-3">
+                                <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+                                    <h3 className="font-bold text-gray-900">{user.name}</h3>
+                                    <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClasses(user.status)}`}>
+                                        {user.status}
+                                    </span>
+                                </div>
+                                <div className="text-sm space-y-2">
+                                    <p><strong className="font-medium text-gray-600">Email:</strong> {user.email}</p>
+                                    <p><strong className="font-medium text-gray-600">Submitted:</strong> {user.date}</p>
+                                </div>
+                                <div className="flex justify-end space-x-2 pt-2">
+                                    {/* Action Buttons */}
+                                    <button onClick={() => handleAction(user.id, 'Verified')} className="p-2 text-green-600 hover:bg-green-100 rounded-full transition-colors" title="Verify" disabled={user.status !== 'Pending'}> <Check className="w-5 h-5" /> </button>
+                                    <button onClick={() => handleAction(user.id, 'Rejected')} className="p-2 text-red-600 hover:bg-red-100 rounded-full transition-colors" title="Reject" disabled={user.status !== 'Pending'}> <X className="w-5 h-5" /> </button>
+                                    <button onClick={() => handleDelete(user.id, user.name)} className="p-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors" title="Delete"> <Trash className="w-5 h-5" /> </button>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="py-10 text-center text-gray-500">
+                            No users found matching your search.
+                        </div>
+                    )}
+                </div>
             </div>
+
 
             {/* Pagination */}
             <div className="flex flex-col md:flex-row items-center justify-between mt-6 gap-4">
