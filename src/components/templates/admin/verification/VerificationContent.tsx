@@ -1,10 +1,9 @@
-// Ganti nama file menjadi: @/components/templates/admin/verification/ConsultationContent.tsx
-
 'use client'
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { Search, ChevronLeft, ChevronRight, Check, X, Trash } from 'lucide-react';
 import { useDebounce } from 'use-debounce'; // Anda perlu install: npm install use-debounce
+import Swal from 'sweetalert2';
 
 // Definisikan tipe data untuk konsultasi
 interface Consultation {
@@ -67,14 +66,51 @@ const ConsultationContent = () => {
 
 
     // --- Fungsi Aksi (Sementara update state lokal, idealnya panggil API) ---
-    const handleAction = (id: string, newStatus: 'confirmed' | 'cancelled') => {
-        // TODO: Ganti ini dengan fetch API (PUT/PATCH) ke /api/consultation/{id}
-        setConsultations(prev =>
-            prev.map(item =>
-                item.id === id ? { ...item, status: newStatus } : item
-            )
-        );
-        alert(`Status for ${id} changed to ${newStatus}. (Frontend only)`);
+    const handleAction = async (id: string, newStatus: 'pay' | 'cancelled') => {
+        try {
+            const response = await fetch(`/api/consultation/${id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: newStatus }),
+            });
+
+            if (!response.ok) {
+                // Jika server mengembalikan error, tampilkan pesan
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to update status');
+            }
+
+            // Jika berhasil, update state lokal agar UI langsung berubah
+            setConsultations(prev =>
+                prev.map(item =>
+                    item.id === id ? { ...item, status: newStatus } : item
+                )
+            );
+
+            // --- GANTI ALERT DENGAN SWEETALERT SUKSES ---
+            Swal.fire({
+                icon: 'success',
+                title: 'Updated!',
+                text: `Consultation status has been changed to ${newStatus}.`,
+                timer: 2000, // Alert akan hilang setelah 2 detik
+                showConfirmButton: false,
+                background: '#fff',
+                color: '#333'
+            });
+        } catch (error: any) {
+            console.error("Error updating status:", error);
+
+            // --- GANTI ALERT DENGAN SWEETALERT ERROR ---
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: error.message || 'Something went wrong!',
+                background: '#fff',
+                color: '#333'
+            });
+        }
     };
 
     const handleDelete = (id: string, name: string) => {
@@ -88,15 +124,16 @@ const ConsultationContent = () => {
     const getStatusClasses = (status: string) => {
         switch (status.toLowerCase()) {
             case 'pending': return 'bg-yellow-100 text-yellow-800';
-            case 'confirmed': return 'bg-green-100 text-green-800';
+            case 'pay': return 'bg-blue-100 text-blue-800'; // Status baru
             case 'cancelled': return 'bg-red-100 text-red-800';
+            case 'confirmed': return 'bg-green-100 text-green-800'; // Jaga-jaga jika masih ada
             default: return 'bg-gray-100 text-gray-800';
         }
     };
 
     return (
         <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 md:p-8 shadow-2xl border border-gray-100/50">
-            {/* Header & Search (Sudah baik, tidak ada perubahan) */}
+            {/* Header & Search */}
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
                 <h2 className="text-xl md:text-2xl font-bold text-gray-800 flex-1 text-center md:text-left">Consultation Requests</h2>
                 <div className="relative w-full md:w-auto">
@@ -113,13 +150,13 @@ const ConsultationContent = () => {
                 </div>
             </div>
 
+            {/* Kontainer untuk Tabel dan Kartu */}
             <div className="min-h-[400px]">
                 {/* Tampilan Tabel Desktop */}
                 <div className="overflow-x-auto hidden md:block">
                     <table className="min-w-full w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50/70">
                             <tr>
-                                {/* --- PERBAIKAN: Padding lebih adaptif --- */}
                                 <th className="px-4 md:px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Patient Name</th>
                                 <th className="px-4 md:px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Psychologist</th>
                                 <th className="px-4 md:px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Topic</th>
@@ -134,7 +171,6 @@ const ConsultationContent = () => {
                             ) : consultations.length > 0 ? (
                                 consultations.map((item) => (
                                     <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                                        {/* --- PERBAIKAN: Padding lebih adaptif --- */}
                                         <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.user.name}</td>
                                         <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.name_psikolog}</td>
                                         <td className="px-4 md:px-6 py-4 whitespace-nowrap text-sm text-gray-600">{item.main_topic}</td>
@@ -142,15 +178,21 @@ const ConsultationContent = () => {
                                             {new Date(item.createdAt).toLocaleDateString()}
                                         </td>
                                         <td className="px-4 md:px-6 py-4 whitespace-nowrap">
-                                            <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClasses(item.status)}`}>
+                                            <span className={`capitalize px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClasses(item.status)}`}>
                                                 {item.status}
                                             </span>
                                         </td>
                                         <td className="px-4 md:px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <div className="flex justify-end space-x-2">
-                                                <button onClick={() => handleAction(item.id, 'confirmed')} className="p-2 text-green-600 hover:bg-green-100 rounded-full transition-colors" title="Confirm" disabled={item.status !== 'pending'}> <Check className="w-5 h-5" /> </button>
-                                                <button onClick={() => handleAction(item.id, 'cancelled')} className="p-2 text-red-600 hover:bg-red-100 rounded-full transition-colors" title="Cancel" disabled={item.status !== 'pending'}> <X className="w-5 h-5" /> </button>
-                                                <button onClick={() => handleDelete(item.id, item.user.name)} className="p-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors" title="Delete"> <Trash className="w-5 h-5" /> </button>
+                                                <button onClick={() => handleAction(item.id, 'pay')} className="p-2 text-green-600 hover:bg-green-100 rounded-full transition-colors" title="Set to Pay" disabled={item.status !== 'pending'}>
+                                                    <Check className="w-5 h-5" />
+                                                </button>
+                                                <button onClick={() => handleAction(item.id, 'cancelled')} className="p-2 text-red-600 hover:bg-red-100 rounded-full transition-colors" title="Cancel" disabled={item.status !== 'pending'}>
+                                                    <X className="w-5 h-5" />
+                                                </button>
+                                                <button onClick={() => handleDelete(item.id, item.user.name)} className="p-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors" title="Delete">
+                                                    <Trash className="w-5 h-5" />
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -162,7 +204,7 @@ const ConsultationContent = () => {
                     </table>
                 </div>
 
-                {/* Tampilan Kartu Mobile (Sudah baik, tidak ada perubahan) */}
+                {/* Tampilan Kartu Mobile */}
                 <div className="grid grid-cols-1 gap-4 md:hidden">
                     {isLoading ? (
                         <div className="py-10 text-center text-gray-500">Loading...</div>
@@ -171,7 +213,9 @@ const ConsultationContent = () => {
                             <div key={item.id} className="bg-white/70 p-4 rounded-xl shadow-md border border-gray-100 space-y-3">
                                 <div className="flex justify-between items-center pb-2 border-b border-gray-200">
                                     <h3 className="font-bold text-gray-900">{item.user.name}</h3>
-                                    <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClasses(item.status)}`}>{item.status}</span>
+                                    <span className={`capitalize px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClasses(item.status)}`}>
+                                        {item.status}
+                                    </span>
                                 </div>
                                 <div className="text-sm space-y-2">
                                     <p><strong className="font-medium text-gray-600">Psychologist:</strong> {item.name_psikolog}</p>
@@ -179,9 +223,15 @@ const ConsultationContent = () => {
                                     <p><strong className="font-medium text-gray-600">Submitted:</strong> {new Date(item.createdAt).toLocaleDateString()}</p>
                                 </div>
                                 <div className="flex justify-end space-x-2 pt-2">
-                                    <button onClick={() => handleAction(item.id, 'confirmed')} className="p-2 text-green-600 hover:bg-green-100 rounded-full" title="Confirm" disabled={item.status !== 'pending'}><Check className="w-5 h-5" /></button>
-                                    <button onClick={() => handleAction(item.id, 'cancelled')} className="p-2 text-red-600 hover:bg-red-100 rounded-full" title="Cancel" disabled={item.status !== 'pending'}><X className="w-5 h-5" /></button>
-                                    <button onClick={() => handleDelete(item.id, item.user.name)} className="p-2 text-gray-600 hover:bg-gray-100 rounded-full" title="Delete"><Trash className="w-5 h-5" /></button>
+                                    <button onClick={() => handleAction(item.id, 'pay')} className="p-2 text-green-600 hover:bg-green-100 rounded-full transition-colors" title="Set to Pay" disabled={item.status !== 'pending'}>
+                                        <Check className="w-5 h-5" />
+                                    </button>
+                                    <button onClick={() => handleAction(item.id, 'cancelled')} className="p-2 text-red-600 hover:bg-red-100 rounded-full transition-colors" title="Cancel" disabled={item.status !== 'pending'}>
+                                        <X className="w-5 h-5" />
+                                    </button>
+                                    <button onClick={() => handleDelete(item.id, item.user.name)} className="p-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors" title="Delete">
+                                        <Trash className="w-5 h-5" />
+                                    </button>
                                 </div>
                             </div>
                         ))
@@ -197,7 +247,6 @@ const ConsultationContent = () => {
                     Showing {consultations.length} of {totalItems} results
                 </span>
                 <nav className="relative z-0 inline-flex rounded-full shadow-sm -space-x-px" aria-label="Pagination">
-                    {/* --- PERBAIKAN: Melengkapi className pada button --- */}
                     <button
                         onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                         disabled={currentPage === 1 || isLoading}
@@ -208,13 +257,12 @@ const ConsultationContent = () => {
                     <span className="relative inline-flex items-center px-4 py-2 border-y border-gray-300 bg-white text-sm font-medium text-gray-700">
                         Page {currentPage} of {totalPages}
                     </span>
-                    {/* --- PERBAIKAN: Melengkapi className pada button --- */}
                     <button
                         onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                         disabled={currentPage === totalPages || isLoading}
                         className="relative inline-flex items-center px-2 py-2 rounded-r-full border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
-                        <ChevronRight className="h-5 w-5" />
+                        <ChevronRight className="w-5 h-5" />
                     </button>
                 </nav>
             </div>
