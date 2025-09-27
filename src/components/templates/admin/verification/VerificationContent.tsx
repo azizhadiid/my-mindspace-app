@@ -114,11 +114,54 @@ const ConsultationContent = () => {
     };
 
     const handleDelete = (id: string, name: string) => {
-        // TODO: Ganti ini dengan fetch API (DELETE) ke /api/consultation/{id}
-        if (window.confirm(`Are you sure you want to delete ${name}'s consultation?`)) {
-            setConsultations(prev => prev.filter(item => item.id !== id));
-            alert(`Consultation from ${name} deleted. (Frontend only)`);
-        }
+        // 1. Tampilkan dialog konfirmasi
+        Swal.fire({
+            title: 'Are you sure?',
+            text: `You are about to delete the consultation belonging to "${name}`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33', // Warna tombol konfirmasi (merah)
+            cancelButtonColor: '#3085d6', // Warna tombol batal (biru)
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel',
+            background: '#fff',
+            color: '#333'
+        }).then(async (result) => {
+            // 2. Cek apakah pengguna menekan tombol konfirmasi
+            if (result.isConfirmed) {
+                try {
+                    // 3. Jika dikonfirmasi, kirim request DELETE ke API
+                    const response = await fetch(`/api/consultation/${id}`, {
+                        method: 'DELETE',
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'Failed to delete data');
+                    }
+
+                    // 4. Hapus item dari state agar UI ter-update
+                    setConsultations(prev => prev.filter(item => item.id !== id));
+
+                    // 5. Tampilkan notifikasi sukses
+                    Swal.fire({
+                        title: 'Success!!',
+                        text: 'Consultation data has been deleted.',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false,
+                    });
+
+                } catch (error: any) {
+                    // 6. Tampilkan notifikasi jika terjadi error
+                    Swal.fire({
+                        title: 'Failed!',
+                        text: error.message || 'Unable to delete consultation.',
+                        icon: 'error',
+                    });
+                }
+            }
+        });
     };
 
     const getStatusClasses = (status: string) => {

@@ -62,3 +62,34 @@ export async function PATCH(
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
+
+export async function DELETE(
+    req: NextRequest,
+    context: { params: { id: string } }
+) {
+    try {
+        // Autorisasi Admin
+        const cookieStore = await cookies();
+        const token = cookieStore.get('token')?.value;
+        if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+        const decoded = jwt.verify(token, JWT_SECRET) as { role: string };
+        if (decoded.role !== 'ADMIN') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+
+        const { id } = await context.params;
+
+        // Perintah untuk menghapus data dari database
+        await prisma.consultation.delete({
+            where: { id: id },
+        });
+
+        return NextResponse.json({ message: 'Consultation deleted successfully' }, { status: 200 });
+
+    } catch (error: any) {
+        // Handle jika data dengan ID tersebut tidak ditemukan
+        if (error.code === 'P2025') {
+            return NextResponse.json({ error: 'Consultation not found' }, { status: 404 });
+        }
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
+}
