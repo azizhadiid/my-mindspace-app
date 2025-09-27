@@ -2,7 +2,7 @@
 
 import AdminLayout from '@/components/templates/admin/MainTemplateAdmin';
 import Sidebar from '@/components/templates/admin/SideBar';
-import VerificationContent from '@/components/templates/admin/verification/VerificationContent';
+import ConsultationContent from '@/components/templates/admin/verification/VerificationContent';
 import React, { useState } from 'react';
 
 const VerifikasiKonsultasiPagae = () => {
@@ -17,7 +17,7 @@ const VerifikasiKonsultasiPagae = () => {
             <AdminLayout
                 setSidebarOpen={setSidebarOpen}
             >
-                <VerificationContent />
+                <ConsultationContent />
             </AdminLayout>
         </div>
     );
