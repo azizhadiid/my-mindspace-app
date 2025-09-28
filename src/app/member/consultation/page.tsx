@@ -2,7 +2,8 @@
 'use client'
 
 import { useAuth } from "@/hooks/useAuth";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Head from 'next/head';
 
 // Components
 import MainTemplateMember from "@/components/templates/member/MainTemplateMember";
@@ -119,12 +120,40 @@ const ConsultationPage = () => {
                 // 👇 PERUBAHAN DI SINI: Sertakan nama psikolog
                 body: JSON.stringify({
                     ...formData,
-                    psychologistName: selectedPsychologist.name
+                    psychologistName: selectedPsychologist.name,
+                    price: selectedPsychologist.price,
                 }),
             });
 
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || "Failed to book consultation");
+
+            // 🚀 Midtrans Snap Popup
+            const snap = (window as any).snap;
+            if (snap && data.token) { // Pastikan token ada
+                snap.pay(data.token, { // Langsung gunakan data.token
+                    onSuccess: function (result: any) {
+                        toast.success("Payment successful! Please wait for confirmation.");
+                        // Anda bisa redirect ke halaman "my-orders" atau semacamnya
+                        // window.location.href = '/member/my-consultations';
+                    },
+                    onPending: function (result: any) {
+                        toast("Waiting for your payment...");
+                    },
+                    onError: function (result: any) {
+                        toast.error("Payment failed. Please try again.");
+                    },
+                    onClose: function () {
+                        // Tidak perlu melakukan apa-apa karena data di DB statusnya sudah 'PENDING'
+                        // Mungkin bisa dihapus setelah beberapa waktu dengan cron job
+                        toast("You closed the payment pop-up.");
+                    },
+                });
+            } else {
+                // Fallback jika snap tidak ada (jarang terjadi)
+                // Anda mungkin perlu handle redirect URL dari Midtrans jika ada
+                console.error("Snap.js is not loaded or token is missing");
+            }
 
             toast.success("Consultation successfully scheduled!");
             setShowBookingForm(false);
