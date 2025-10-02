@@ -21,6 +21,22 @@ model User {
   Consultation       Consultation[]
 }
 
+// Untuk Pshikologi
+model Psychologist {
+  id             String   @id @default(cuid()) // id acak otomatis
+  name           String
+  specialization String
+  rating         Float
+  experience     String
+  price          String
+  image          String
+  verified       Boolean  @default(false)
+  phoneNumber    String   @unique // nomor HP, dibuat unik agar tidak duplikat
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// Untuk Konsultasi
 model Consultation {
   id            String   @id @default(cuid())
   userId        String
