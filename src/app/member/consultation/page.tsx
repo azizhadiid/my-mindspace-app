@@ -3,7 +3,7 @@
 
 import { useAuth } from "@/hooks/useAuth";
 import React, { useState, useEffect } from 'react';
-import Head from 'next/head';
+import toast from "react-hot-toast";
 
 // Components
 import MainTemplateMember from "@/components/templates/member/MainTemplateMember";
@@ -13,33 +13,16 @@ import WhyChooseUsSection from "@/components/templates/member/consultation/WhyCh
 import CTASection from "@/components/templates/member/consultation/CTASection";
 import BookingFormModal from "@/components/templates/member/consultation/BookingFormModal";
 import HeroSection from "@/components/templates/member/consultation/HeroSection";
-import toast from "react-hot-toast";
 
-interface Psychologist {
-    id: string;
-    name: string;
-    specialization: string;
-    rating: number;
-    experience: string;
-    price: string;
-    availability: string;
-    image: string;
-    languages: string[];
-    verified: boolean;
-}
-
-interface ConsultationForm {
-    psychologistId: string;
-    date: string;
-    time: string;
-    type: 'video' | 'chat' | 'phone';
-    topic: string;
-    description: string;
-    urgency: 'low' | 'medium' | 'high';
-}
+// Types
+import type { ConsultationForm, Psychologist } from "@/types/psychologist";
 
 const ConsultationPage = () => {
-    const { user, loading } = useAuth("MEMBER");
+    const { user, loading: authLoading } = useAuth("MEMBER");
+    // 👇 PERUBAHAN 2: Tambahkan state untuk data psikolog dan loading
+    const [psychologists, setPsychologists] = useState<Psychologist[]>([]);
+    const [isLoadingData, setIsLoadingData] = useState(true); // State loading untuk data
+
     const [selectedPsychologist, setSelectedPsychologist] = useState<Psychologist | null>(null);
     const [showBookingForm, setShowBookingForm] = useState(false);
     const [formData, setFormData] = useState<ConsultationForm>({
@@ -52,44 +35,29 @@ const ConsultationPage = () => {
         urgency: 'medium'
     });
 
-    const psychologists: Psychologist[] = [
-        {
-            id: '1',
-            name: 'Dr. Sarah Mitchell',
-            specialization: 'Anxiety & Depression',
-            rating: 4.9,
-            experience: '8 years',
-            price: 'Rp 350.000',
-            availability: 'Available today',
-            image: '/api/placeholder/120/120',
-            languages: ['Indonesian', 'English'],
-            verified: true
-        },
-        {
-            id: '2',
-            name: 'Dr. Ahmad Rahman',
-            specialization: 'Family Therapy',
-            rating: 4.8,
-            experience: '12 years',
-            price: 'Rp 400.000',
-            availability: 'Available tomorrow',
-            image: '/api/placeholder/120/120',
-            languages: ['Indonesian', 'English', 'Arabic'],
-            verified: true
-        },
-        {
-            id: '3',
-            name: 'Dr. Lisa Chen',
-            specialization: 'Teen Counseling',
-            rating: 4.9,
-            experience: '6 years',
-            price: 'Rp 300.000',
-            availability: 'Available in 2 days',
-            image: '/api/placeholder/120/120',
-            languages: ['Indonesian', 'English', 'Mandarin'],
-            verified: true
-        }
-    ];
+    // 👇 PERUBAHAN 3: Gunakan useEffect untuk mengambil data dari API saat komponen dimuat
+    useEffect(() => {
+        const fetchPsychologists = async () => {
+            try {
+                const res = await fetch('/api/member/consultations');
+                if (!res.ok) {
+                    throw new Error('Failed to fetch data');
+                }
+                const data = await res.json();
+                setPsychologists(data);
+            } catch (error) {
+                console.error(error);
+                toast.error("Could not load psychologists data.");
+            } finally {
+                setIsLoadingData(false); // Hentikan loading setelah selesai
+            }
+        };
+
+        fetchPsychologists();
+    }, []); // Array dependensi kosong agar hanya berjalan sekali
+
+    // 👇 PERUBAHAN 4: Hapus data `psychologists` yang di-hardcode
+    // const psychologists: Psychologist[] = [ ... ]; <-- HAPUS BLOK INI
 
     const handleBookConsultation = (psychologist: Psychologist) => {
         // Cek jika user belum login
@@ -174,7 +142,7 @@ const ConsultationPage = () => {
         }
     };
 
-    if (loading) {
+    if (authLoading || isLoadingData) {
         return (
             <div className="flex flex-col items-center justify-center h-screen">
                 <div className="w-12 h-12 rounded-full border-4 border-t-4 border-gray-200 border-t-pink-500 animate-spin"></div>

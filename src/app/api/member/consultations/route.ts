@@ -20,6 +20,25 @@ interface JwtPayload {
     role: string;
 }
 
+// Mengmabil data Pshikologi
+export async function GET() {
+    try {
+        const psychologists = await prisma.psychologist.findMany({
+            // Urutkan berdasarkan rating, dari tertinggi ke terendah
+            orderBy: {
+                rating: 'desc',
+            },
+        });
+        return NextResponse.json(psychologists);
+    } catch (error) {
+        console.error("Failed to fetch psychologists:", error);
+        return NextResponse.json(
+            { error: "Internal Server Error" },
+            { status: 500 }
+        );
+    }
+}
+
 export async function POST(req: Request) {
     try {
         // 1. Otentikasi: Ambil token dari cookie

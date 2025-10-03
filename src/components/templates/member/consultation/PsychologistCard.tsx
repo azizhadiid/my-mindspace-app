@@ -3,40 +3,49 @@
 // components/consultation/PsychologistCard.tsx
 import React from 'react';
 import { Star, Clock, CheckCircle, ArrowRight, User } from 'lucide-react';
-
-interface Psychologist {
-    id: string;
-    name: string;
-    specialization: string;
-    rating: number;
-    experience: string;
-    price: string;
-    availability: string;
-    image: string; // Not used in this version but good practice to keep
-    languages: string[];
-    verified: boolean;
-}
+import type { Psychologist } from '@/types/psychologist';
+import Image from 'next/image';
 
 interface PsychologistCardProps {
     psychologist: Psychologist;
     onBook: (psychologist: Psychologist) => void;
 }
 
+// Fungsi kecil untuk format harga
+const formatPrice = (priceString: string) => {
+    const priceNumber = parseInt(priceString, 10);
+    if (isNaN(priceNumber)) {
+        return priceString; // Kembalikan string asli jika bukan angka
+    }
+    return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0,
+    }).format(priceNumber);
+};
+
 const PsychologistCard: React.FC<PsychologistCardProps> = ({ psychologist, onBook }) => {
     return (
-        <div className="group bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-pink-100 hover:border-pink-300 transition-all duration-500 hover:shadow-2xl hover:shadow-pink-500/20 hover:-translate-y-2">
+        <div className="group bg-white/80 backdrop-blur-sm rounded-3xl p-8 border border-pink-100 hover:border-pink-300 transition-all duration-500 hover:shadow-2xl hover:shadow-pink-500/20 hover:-translate-y-2 flex flex-col">
             <div className="relative mb-6">
-                <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-r from-red-400 to-pink-400 flex items-center justify-center">
-                    <User className="w-12 h-12 text-white" />
+                {/* 👇 PERUBAHAN 2: Gunakan Next/Image untuk menampilkan gambar dari database */}
+                <div className="w-24 h-24 mx-auto rounded-full overflow-hidden relative border-4 border-pink-100">
+                    <Image
+                        src={psychologist.image}
+                        alt={`Photo of ${psychologist.name}`}
+                        fill // Ganti layout="fill" dengan ini
+                        className="object-cover" // Ganti objectFit="cover" dengan ini
+                        unoptimized
+                    />
                 </div>
                 {psychologist.verified && (
-                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                    <div className="absolute top-0 right-1/2 translate-x-[60px] w-8 h-8 bg-green-500 rounded-full flex items-center justify-center border-2 border-white">
                         <CheckCircle className="w-5 h-5 text-white" />
                     </div>
                 )}
             </div>
 
-            <div className="text-center mb-6">
+            <div className="text-center mb-6 flex-grow">
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{psychologist.name}</h3>
                 <p className="text-pink-600 font-medium mb-3">{psychologist.specialization}</p>
 
@@ -51,16 +60,12 @@ const PsychologistCard: React.FC<PsychologistCardProps> = ({ psychologist, onBoo
                     </div>
                 </div>
 
-                <div className="flex flex-wrap justify-center gap-1 mb-4">
-                    {psychologist.languages.map((lang) => (
-                        <span key={lang} className="px-2 py-1 bg-pink-50 text-pink-600 text-xs rounded-full">
-                            {lang}
-                        </span>
-                    ))}
-                </div>
+                {/* 👇 PERUBAHAN 3: Hapus bagian yang menampilkan `languages` dan `availability` */}
+                {/* <div className="flex flex-wrap ..."> ... </div> */}
+                {/* <p className="text-sm text-green-600 ...">{psychologist.availability}</p> */}
 
-                <p className="text-2xl font-bold text-gray-900 mb-2">{psychologist.price}</p>
-                <p className="text-sm text-green-600 font-medium mb-6">{psychologist.availability}</p>
+                {/* Gunakan fungsi formatPrice untuk harga */}
+                <p className="text-2xl font-bold text-gray-900 mb-2">{formatPrice(psychologist.price)}</p>
             </div>
 
             <button
