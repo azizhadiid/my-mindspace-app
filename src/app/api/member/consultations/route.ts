@@ -72,25 +72,13 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Invalid date or time format" }, { status: 400 });
         }
 
-        // 4. Simpan ke database menggunakan Prisma
-        const newConsultation = await prisma.consultation.create({
-            data: {
-                userId: payload.id, // ID pengguna dari token JWT
-                name_psikolog: psychologistName,
-                type: type,
-                date: consultationDateTime,
-                main_topic: topic,
-                description: description || null, // Handle deskripsi opsional
-                urgency: urgency,
-                // status default 'pending' akan diatur oleh Prisma
-            },
-        });
+        const orderId = `consult-${payload.id}-${Date.now()}`;
 
         // 💳 Buat transaksi Midtrans
         const transaction = await snap.createTransaction({
             transaction_details: {
-                order_id: `consult-${newConsultation.id}-${Date.now()}`,
-                gross_amount: parseInt(price.replace(/\D/g, "")), // ambil angka dari "Rp 350.000"
+                order_id: orderId,
+                gross_amount: parseInt(price.replace(/\D/g, "")),
             },
             customer_details: {
                 first_name: payload.email.split("@")[0],
@@ -107,7 +95,7 @@ export async function POST(req: Request) {
         });
 
         // 5. Beri respons sukses
-        return NextResponse.json({ token: transaction.token });
+        return NextResponse.json({ token: transaction.token, orderId });
 
     } catch (error) {
         console.error("Failed to create consultation:", error);

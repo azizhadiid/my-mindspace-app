@@ -99,24 +99,24 @@ const ConsultationPage = () => {
             // 🚀 Midtrans Snap Popup
             const snap = (window as any).snap;
             if (snap && data.token) { // Pastikan token ada
-                snap.pay(data.token, { // Langsung gunakan data.token
-                    onSuccess: function (result: any) {
-                        toast.success("Payment successful! Please wait for confirmation.");
-                        // Anda bisa redirect ke halaman "my-orders" atau semacamnya
-                        // window.location.href = '/member/my-consultations';
+                snap.pay(data.token, {
+                    onSuccess: async (result: any) => {
+                        await fetch("/api/payment/notification", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                order_id: result.order_id,
+                                transaction_status: "settlement",
+                                item_details: result.item_details,
+                            }),
+                        });
+                        toast.success("Payment successful!");
                     },
-                    onPending: function (result: any) {
-                        toast("Waiting for your payment...");
-                    },
-                    onError: function (result: any) {
-                        toast.error("Payment failed. Please try again.");
-                    },
-                    onClose: function () {
-                        // Tidak perlu melakukan apa-apa karena data di DB statusnya sudah 'PENDING'
-                        // Mungkin bisa dihapus setelah beberapa waktu dengan cron job
-                        toast("You closed the payment pop-up.");
-                    },
+                    onPending: () => toast("Waiting for payment..."),
+                    onError: () => toast.error("Payment failed."),
+                    onClose: () => toast("Payment popup closed."),
                 });
+
             } else {
                 // Fallback jika snap tidak ada (jarang terjadi)
                 // Anda mungkin perlu handle redirect URL dari Midtrans jika ada
