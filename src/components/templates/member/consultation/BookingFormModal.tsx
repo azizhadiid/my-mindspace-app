@@ -1,23 +1,8 @@
 'use client'
 
-import React, { useEffect } from 'react'; // Import useEffect
+import React, { useEffect, useState } from 'react'; // Import useEffect
 import { MessageSquare, Phone } from 'lucide-react';
-
-interface Psychologist {
-    id: string;
-    name: string;
-    price: string;
-}
-
-interface ConsultationForm {
-    psychologistId: string;
-    date: string;
-    time: string;
-    type: 'video' | 'chat' | 'phone';
-    topic: string;
-    description: string;
-    urgency: 'low' | 'medium' | 'high';
-}
+import type { ConsultationForm, Psychologist } from '@/types/psychologist';
 
 interface BookingFormModalProps {
     selectedPsychologist: Psychologist;
@@ -34,6 +19,8 @@ const BookingFormModal: React.FC<BookingFormModalProps> = ({
     handleSubmit,
     onClose
 }) => {
+    const [isLoading, setIsLoading] = useState(false);
+
     // Gunakan useEffect untuk menonaktifkan scroll pada body saat modal terbuka
     useEffect(() => {
         document.body.style.overflow = 'hidden';
@@ -43,6 +30,20 @@ const BookingFormModal: React.FC<BookingFormModalProps> = ({
             document.body.style.overflow = 'unset';
         };
     }, []); // Array dependensi kosong agar efek hanya berjalan saat komponen mount dan unmount
+
+    const handleLocalSubmit = async (e: React.FormEvent) => {
+        e.preventDefault(); // Mencegah refresh halaman
+        setIsLoading(true); // Mulai loading
+
+        try {
+            await handleSubmit(e); // Panggil fungsi submit asli dari props
+        } catch (error) {
+            console.error("Submission error:", error);
+            // Anda bisa menambahkan notifikasi error di sini jika perlu
+        } finally {
+            setIsLoading(false); // Hentikan loading, baik berhasil maupun gagal
+        }
+    };
 
     const consultationTypes = [
         {
@@ -77,7 +78,7 @@ const BookingFormModal: React.FC<BookingFormModalProps> = ({
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="w-full max-w-2xl">
-                <form onSubmit={handleSubmit} className="bg-white rounded-3xl p-8 flex flex-col max-h-[90vh] overflow-hidden">
+                <form onSubmit={handleLocalSubmit} className="bg-white rounded-3xl p-8 flex flex-col max-h-[90vh] overflow-hidden">
                     {/* Header (fixed at the top) */}
                     <div className="flex items-center justify-between mb-8">
                         <div>
@@ -215,11 +216,27 @@ const BookingFormModal: React.FC<BookingFormModalProps> = ({
                         >
                             Cancel
                         </button>
+                        {/* PERUBAHAN 5: Modifikasi tombol submit */}
                         <button
                             type="submit"
-                            className="flex-1 bg-gradient-to-r from-red-500 to-pink-500 text-white py-3 px-6 rounded-xl font-medium hover:from-red-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                            disabled={isLoading} // Tombol dinonaktifkan saat loading
+                            className="flex-1 bg-gradient-to-r from-red-500 to-pink-500 text-white py-3 px-6 rounded-xl font-medium transition-all duration-300 transform shadow-lg flex items-center justify-center
+                                       disabled:opacity-70 disabled:cursor-not-allowed
+                                       hover:enabled:from-red-600 hover:enabled:to-pink-600 hover:enabled:scale-105 hover:enabled:shadow-xl"
                         >
-                            Book Consultation - {selectedPsychologist.price}
+                            {isLoading ? (
+                                // Tampilan saat loading
+                                <>
+                                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Consul...
+                                </>
+                            ) : (
+                                // Tampilan normal
+                                `Consultation - Rp. ${selectedPsychologist.price}`
+                            )}
                         </button>
                     </div>
                 </form>
