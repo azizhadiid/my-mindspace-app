@@ -17,23 +17,32 @@ export async function POST(req: Request) {
         // const statusResponse = await core.transaction.notification(body);
         const orderId = body.order_id;
         const transactionStatus = body.transaction_status;
+        const details = body.consultationDetails;
 
         // 🔎 Ambil detail booking dari order_id
         // Misalnya orderId format: consult-{userId}-timestamp
         const [_, userId] = orderId.split("-");
 
+        // Validasi sederhana
+        if (!details) {
+            return NextResponse.json({ error: "Missing consultation details" }, { status: 400 });
+        }
+
+        // Gabungkan tanggal dan waktu dari user menjadi satu objek Date
+        const consultationDateTime = new Date(`${details.date}T${details.time}`);
+
         if (transactionStatus === "capture" || transactionStatus === "settlement") {
             // sukses bayar
             await prisma.consultation.create({
                 data: {
-                    userId: userId, // relasi otomatis ke tabel User
-                    name_psikolog: body.item_details?.[0]?.name ?? "Unknown Psychologist",
-                    type: "video",
-                    date: new Date(),
-                    urgency: "medium",
-                    status: "pay",
-                    main_topic: "General Consultation", // <-- WAJIB isi
-                    description: "", // <-- optional, bisa kosong
+                    userId: userId,
+                    name_psikolog: details.psychologistName, // <-- Gunakan data dari 'details'
+                    type: details.type,                     // <-- Gunakan data dari 'details'
+                    date: consultationDateTime,             // <-- Gunakan tanggal & waktu pilihan user
+                    main_topic: details.topic,              // <-- Gunakan data dari 'details'
+                    description: details.description,       // <-- Gunakan data dari 'details'
+                    urgency: details.urgency,               // <-- Gunakan data dari 'details'
+                    status: "pay", // atau "confirmed" sesuai logika Anda
                 },
             });
             // console.log("Midtrans Notification:", statusResponse);
@@ -44,13 +53,13 @@ export async function POST(req: Request) {
             await prisma.consultation.create({
                 data: {
                     userId: userId,
-                    name_psikolog: body.item_details?.[0]?.name ?? "Unknown Psychologist",
-                    type: "video",
-                    date: new Date(),
-                    urgency: "medium",
-                    status: "pending",
-                    main_topic: "General Consultation",
-                    description: "",
+                    name_psikolog: details.psychologistName, // <-- Gunakan data dari 'details'
+                    type: details.type,                     // <-- Gunakan data dari 'details'
+                    date: consultationDateTime,             // <-- Gunakan tanggal & waktu pilihan user
+                    main_topic: details.topic,              // <-- Gunakan data dari 'details'
+                    description: details.description,       // <-- Gunakan data dari 'details'
+                    urgency: details.urgency,               // <-- Gunakan data dari 'details'
+                    status: "pending", // atau "confirmed" sesuai logika Anda
                 },
             });
         } else if (transactionStatus === "deny" || transactionStatus === "expire" || transactionStatus === "cancel") {

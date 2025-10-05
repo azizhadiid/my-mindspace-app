@@ -107,7 +107,16 @@ const ConsultationPage = () => {
                             body: JSON.stringify({
                                 order_id: result.order_id,
                                 transaction_status: "settlement",
-                                item_details: result.item_details,
+                                // 👇 TAMBAHKAN INI: Kirim detail konsultasi
+                                consultationDetails: {
+                                    psychologistName: selectedPsychologist.name,
+                                    date: formData.date,
+                                    time: formData.time,
+                                    type: formData.type,
+                                    topic: formData.topic,
+                                    description: formData.description,
+                                    urgency: formData.urgency,
+                                }
                             }),
                         });
                         toast.success("Payment successful!");
