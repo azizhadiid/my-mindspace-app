@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import midtransClient from "midtrans-client";
+import { sendConsultationConfirmationEmail } from "@/lib/brevo";
 
 const prisma = new PrismaClient();
 
@@ -33,7 +34,7 @@ export async function POST(req: Request) {
 
         if (transactionStatus === "capture" || transactionStatus === "settlement") {
             // sukses bayar
-            await prisma.consultation.create({
+            const newConsultation = await prisma.consultation.create({
                 data: {
                     userId: userId,
                     name_psikolog: details.psychologistName, // <-- Gunakan data dari 'details'
@@ -45,9 +46,26 @@ export async function POST(req: Request) {
                     status: "pay", // atau "confirmed" sesuai logika Anda
                 },
             });
-            // console.log("Midtrans Notification:", statusResponse);
-            // console.log("Body:", body);
-            // console.log("Extracted userId:", userId);
+            // --- MULAI LOGIKA PENGIRIMAN EMAIL ---
+            console.log("Pembayaran berhasil, mencoba mengirim email...");
+
+            // 2. Ambil data lengkap dari DB untuk dikirim via email
+            const user = await prisma.user.findUnique({ where: { id: userId } });
+            const psychologist = await prisma.psychologist.findUnique({ where: { id: details.psychologistId } });
+
+            if (user && psychologist) {
+                // 3. Panggil fungsi pengirim email dengan data yang relevan
+                await sendConsultationConfirmationEmail({
+                    toEmail: user.email,
+                    userName: user.name || user.email.split('@')[0], // Fallback jika user tidak punya nama
+                    psychologistName: psychologist.name,
+                    psychologistPhone: psychologist.phoneNumber,
+                    consultationDate: newConsultation.date,
+                });
+            } else {
+                console.error(`Data User (ID: ${userId}) atau Psikolog (ID: ${details.psychologistId}) tidak ditemukan di DB.`);
+            }
+            // --- SELESAI LOGIKA PENGIRIMAN EMAIL ---
 
         } else if (transactionStatus === "pending") {
             await prisma.consultation.create({

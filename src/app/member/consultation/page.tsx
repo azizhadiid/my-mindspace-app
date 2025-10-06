@@ -109,6 +109,7 @@ const ConsultationPage = () => {
                                 transaction_status: "settlement",
                                 // 👇 TAMBAHKAN INI: Kirim detail konsultasi
                                 consultationDetails: {
+                                    psychologistId: selectedPsychologist.id,
                                     psychologistName: selectedPsychologist.name,
                                     date: formData.date,
                                     time: formData.time,
