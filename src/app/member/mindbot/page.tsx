@@ -47,26 +47,45 @@ const MindBotPage = () => {
         const newUserMessage: Message = {
             id: Date.now().toString(),
             text: inputMessage,
-            sender: 'user',
-            timestamp: new Date()
+            sender: "user",
+            timestamp: new Date(),
         };
 
-        setMessages(prev => [...prev, newUserMessage]);
-        setInputMessage('');
+        setMessages((prev) => [...prev, newUserMessage]);
+        setInputMessage("");
         setIsTyping(true);
 
-        // Simulate AI response delay
-        setTimeout(() => {
+        try {
+            const res = await fetch("/api/member/mindbot", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ input: inputMessage }),
+            });
+
+            const data = await res.json();
+
             const botResponse: Message = {
                 id: (Date.now() + 1).toString(),
-                text: "Thank you for sharing that with me. I understand this might be challenging for you. Can you tell me more about what specifically is making you feel this way? Remember, there's no judgment here - this is a safe space for you to express yourself.",
-                sender: 'bot',
-                timestamp: new Date()
+                text: data.reply || "Maaf, saya tidak bisa merespons saat ini.",
+                sender: "bot",
+                timestamp: new Date(),
             };
-            setMessages(prev => [...prev, botResponse]);
+
+            setMessages((prev) => [...prev, botResponse]);
+        } catch (error) {
+            console.error("Error:", error);
+            const fallback: Message = {
+                id: (Date.now() + 2).toString(),
+                text: "Terjadi kesalahan, coba lagi nanti ya 🥲",
+                sender: "bot",
+                timestamp: new Date(),
+            };
+            setMessages((prev) => [...prev, fallback]);
+        } finally {
             setIsTyping(false);
-        }, 2000);
+        }
     };
+
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
