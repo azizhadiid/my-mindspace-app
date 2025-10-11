@@ -31,15 +31,28 @@ const MindBotPage = () => {
     const [inputMessage, setInputMessage] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const scrollContainerRef = useRef<HTMLDivElement | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
+    // 🔹 Cek apakah user scroll ke bawah
+    const [autoScroll, setAutoScroll] = useState(true);
+
+    const handleScroll = () => {
+        const el = scrollContainerRef.current;
+        if (!el) return;
+
+        // Kalau posisi scroll sudah dekat ke bawah (misal 100px dari bawah)
+        const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 100;
+        setAutoScroll(isNearBottom);
+    };
+
     useEffect(() => {
-        scrollToBottom();
-    }, [messages]);
+        if (autoScroll) scrollToBottom();
+    }, [messages, autoScroll]);
 
     const handleSendMessage = async () => {
         if (!inputMessage.trim()) return;
