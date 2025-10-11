@@ -35,7 +35,6 @@ const ChatInputArea: React.FC<ChatInputAreaProps> = ({
                         className="w-full px-4 py-3 pr-12 rounded-full border border-rose-200 focus:border-pink-400 focus:ring-2 focus:ring-pink-200 outline-none transition-all bg-white/80 backdrop-blur-sm"
                         disabled={isTyping}
                     />
-                    <Heart className="absolute right-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-pink-400" />
                 </div>
                 <button
                     onClick={handleSendMessage}

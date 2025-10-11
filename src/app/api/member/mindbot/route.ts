@@ -34,18 +34,52 @@ export async function POST(req: Request) {
 
         const data = await response.json();
 
+        // 🔹 Cek error dari Gemini
         if (!response.ok) {
             console.error("Gemini error:", data);
-            return NextResponse.json({ error: "Gemini API error", details: data }, { status: 502 });
+
+            // 🔸 Tangani error kuota/token habis
+            if (
+                data.error?.status === "RESOURCE_EXHAUSTED" ||
+                data.error?.message?.toLowerCase()?.includes("quota") ||
+                data.error?.message?.toLowerCase()?.includes("exceeded") ||
+                data.error?.message?.toLowerCase()?.includes("token")
+            ) {
+                return NextResponse.json({
+                    reply:
+                        "Sorry, MindBot is currently taking a break because the daily usage limit has been reached. Please try again later 💖",
+                });
+            }
+
+            // 🔸 Tangani error key tidak valid
+            if (data.error?.status === "UNAUTHENTICATED") {
+                return NextResponse.json({
+                    reply:
+                        "Oops, MindBot is having trouble connecting to the server. Please try again later. 🌸",
+                });
+            }
+
+            // 🔸 Default error lain
+            return NextResponse.json(
+                { reply: "Sorry, MindBot is experiencing problems. Please try again later 🌼" },
+                { status: 502 }
+            );
         }
 
+        // ✅ Kalau sukses
         const reply =
             data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-            "Maaf, saya tidak bisa merespons saat ini.";
+            "Sorry, I can't respond at this time.";
 
         return NextResponse.json({ reply });
     } catch (err) {
         console.error("MindBot API Error:", err);
-        return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+        return NextResponse.json(
+            {
+                reply:
+                    "Oops, an error occurred on the server. Please try again later. 🌷",
+            },
+            { status: 500 }
+        );
     }
 }
