@@ -1,4 +1,7 @@
 import { NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 const GEMINI_MODEL = "gemini-2.0-flash"; // atau gemini-1.5-pro, sesuai kebutuhan
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
@@ -14,6 +17,46 @@ export async function POST(req: Request) {
         const apiKey = process.env.GEMINI_API_KEY;
         if (!apiKey) {
             return NextResponse.json({ error: "Missing GEMINI_API_KEY" }, { status: 500 });
+        }
+
+        // 🔍 Deteksi apakah pertanyaan tentang psikolog terbaik
+        const bestPsychologistPattern = /(psikolog terbaik|best psychologist|recommended psychologist|top psychologist)/i;
+
+        if (bestPsychologistPattern.test(input)) {
+            // 🔸 Ambil psikolog dengan rating tertinggi dari database
+            const topPsychologists = await prisma.psychologist.findMany({
+                orderBy: { rating: "desc" },
+                take: 3, // misalnya ambil 3 terbaik
+            });
+
+            if (topPsychologists.length === 0) {
+                return NextResponse.json({
+                    reply: "There is currently no psychologist data on MindSpace.",
+                });
+            }
+
+            // 🔸 Format jawaban alami
+            const formatted = topPsychologists
+                .map((p, i) => {
+                    // Jika p.price berupa string (misalnya "250000"), ubah jadi number
+                    const priceNumber = parseFloat(p.price.replace(/[^\d]/g, "")) || 0;
+
+                    // Format ke Rupiah
+                    const priceFormatted = new Intl.NumberFormat("id-ID", {
+                        style: "currency",
+                        currency: "IDR",
+                        minimumFractionDigits: 0,
+                    }).format(priceNumber);
+
+                    return `${i + 1}. **${p.name}** (${p.specialization}) – ⭐ ${p.rating.toFixed(
+                        1
+                    )}/5, experience ${p.experience}, cost ${priceFormatted}.`;
+                })
+                .join("\n");
+
+            const reply = `Here are some of the best psychologists on MindSpace based on the highest ratings:\n\n${formatted}\n\nAll of these psychologists have been verified and are ready to help you 💬`;
+
+            return NextResponse.json({ reply });
         }
 
         // Kirim permintaan ke Gemini
