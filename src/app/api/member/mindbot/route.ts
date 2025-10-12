@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
 
 const prisma = new PrismaClient();
 
@@ -9,6 +11,24 @@ const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GE
 export async function POST(req: Request) {
     try {
         const { input } = await req.json();
+        // 🧩 Ambil token dari cookies
+        const cookieStore = await cookies();
+        const token = cookieStore.get("token")?.value;
+
+        let userId: string | null = null;
+
+        if (token) {
+            try {
+                const decoded = jwt.verify(token, process.env.JWT_SECRET || "supersecretkey") as {
+                    id: string;
+                    email: string;
+                    role: string;
+                };
+                userId = decoded.id;
+            } catch (err) {
+                console.warn("Invalid or expired token:", err);
+            }
+        }
 
         if (!input) {
             return NextResponse.json({ error: "Missing input message" }, { status: 400 });
@@ -17,6 +37,61 @@ export async function POST(req: Request) {
         const apiKey = process.env.GEMINI_API_KEY;
         if (!apiKey) {
             return NextResponse.json({ error: "Missing GEMINI_API_KEY" }, { status: 500 });
+        }
+
+        // 🔍 Deteksi apakah pertanyaan tentang konsultasi
+        const consultationPattern = /(konsultasi|consultation|jadwal konsultasi|status konsultasi)/i;
+        // 🔍 Jika pertanyaan tentang konsultasi
+        if (consultationPattern.test(input)) {
+            if (!userId) {
+                return NextResponse.json({
+                    reply:
+                        "You are not logged in yet 🌸 Please log in first to see your consultation schedule.",
+                });
+            }
+
+            const consultations = await prisma.consultation.findMany({
+                where: { userId },
+                orderBy: { date: "asc" },
+                take: 5,
+            });
+
+            if (consultations.length === 0) {
+                return NextResponse.json({
+                    reply:
+                        "You currently don't have a consultation scheduled on MindSpace. You can create a new one by clicking the *Create New Consultation* menu. 🌿",
+                });
+            }
+
+            // Format ke teks
+            const formatted = consultations
+                .map((c, i) => {
+                    const date = new Date(c.date).toLocaleString("id-ID", {
+                        weekday: "long",
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    });
+
+                    const urgencyText =
+                        c.urgency === "high"
+                            ? "🔥 Urgent"
+                            : c.urgency === "medium"
+                                ? "⚡ Medium"
+                                : "🕊️ Low";
+
+                    return `${i + 1}. **${c.name_psikolog}** (${c.type}) – ${c.main_topic}
+                        📅 ${date}
+                        📌 Status: ${c.status}
+                        🎯 Priority: ${urgencyText}`;
+                })
+                .join("\n\n");
+
+            const reply = `Here is your consultation schedule at MindSpace:\n\n${formatted}\n\nHope your consultation session goes smoothly 🌼`;
+
+            return NextResponse.json({ reply });
         }
 
         // 🔍 Deteksi apakah pertanyaan tentang psikolog terbaik
