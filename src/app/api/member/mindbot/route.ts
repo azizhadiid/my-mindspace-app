@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 
@@ -94,29 +94,49 @@ export async function POST(req: Request) {
             return NextResponse.json({ reply });
         }
 
-        // 🔍 Deteksi apakah pertanyaan tentang psikolog terbaik
-        const bestPsychologistPattern = /(psikolog terbaik|best psychologist|recommended psychologist|top psychologist)/i;
+        // Rekomendasi psikolog
+        const psychologistPattern =
+            /(best psychologist|psychologist recommendation|best psychologist|psychologist recommendation|good psychologist|psychologist suggestion|psychologist for|suitable psychologist)/i;
 
-        if (bestPsychologistPattern.test(input)) {
-            // 🔸 Ambil psikolog dengan rating tertinggi dari database
+        if (psychologistPattern.test(input)) {
+            // 🔎 Context detection (child, teenager, adult, family, etc) 
+            let specializationFilter: string | undefined;
+
+            if (/child|child|children/i.test(input)) specializationFilter = "Children";
+            else if (/teen|teen|teenager|adolescent/i.test(input)) specializationFilter = "Teenager";
+            else if (/adult|adult/i.test(input)) specializationFilter = "Adult";
+            else if (/family|family|marriage|couple/i.test(input)) specializationFilter = "Family";
+            else if (/career|work|work|career/i.test(input)) specializationFilter = "Career";
+
+            // 🔸 Query ke database
+            const whereClause: Prisma.PsychologistWhereInput = specializationFilter
+                ? {
+                    specialization: {
+                        contains: specializationFilter,
+                        mode: Prisma.QueryMode.insensitive, // ✅ perbaikan di sini
+                    },
+                }
+                : {};
+
             const topPsychologists = await prisma.psychologist.findMany({
+                where: whereClause,
                 orderBy: { rating: "desc" },
-                take: 3, // misalnya ambil 3 terbaik
+                take: 3,
             });
 
             if (topPsychologists.length === 0) {
                 return NextResponse.json({
-                    reply: "There is currently no psychologist data on MindSpace.",
+                    reply:
+                        specializationFilter
+                            ? `There are currently no psychologists listed with the specialty ${specializationFilter} in MindSpace. 🌱`
+                            : "There are no psychologists listed in MindSpace yet.",
                 });
             }
 
-            // 🔸 Format jawaban alami
+            // 🔸 Format respons
             const formatted = topPsychologists
                 .map((p, i) => {
-                    // Jika p.price berupa string (misalnya "250000"), ubah jadi number
                     const priceNumber = parseFloat(p.price.replace(/[^\d]/g, "")) || 0;
-
-                    // Format ke Rupiah
                     const priceFormatted = new Intl.NumberFormat("id-ID", {
                         style: "currency",
                         currency: "IDR",
@@ -125,11 +145,13 @@ export async function POST(req: Request) {
 
                     return `${i + 1}. **${p.name}** (${p.specialization}) – ⭐ ${p.rating.toFixed(
                         1
-                    )}/5, experience ${p.experience}, cost ${priceFormatted}.`;
+                    )}/5\n🧠 Experience: ${p.experience}\n💰 Cost: ${priceFormatted}`;
                 })
-                .join("\n");
+                .join("\n\n");
 
-            const reply = `Here are some of the best psychologists on MindSpace based on the highest ratings:\n\n${formatted}\n\nAll of these psychologists have been verified and are ready to help you 💬`;
+            const reply = specializationFilter
+                ? `Here are the best psychologist recommendations on MindSpace for the case *${specializationFilter.toLowerCase()}*:\n\n${formatted}\n\nAll of these psychologists have been verified and are ready to help 💬`
+                : `Here are some of the best psychologists on MindSpace based on the highest ratings:\n\n${formatted}\n\nAll of these psychologists have been verified and are ready to help 💬`;
 
             return NextResponse.json({ reply });
         }
