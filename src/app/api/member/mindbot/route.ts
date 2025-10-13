@@ -39,6 +39,10 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Missing GEMINI_API_KEY" }, { status: 500 });
         }
 
+        // 🧠 Deteksi apakah input bukan bahasa Inggris
+        const nonEnglishPattern = /\b(yang|saya|tidak|apa|itu|ini|kenapa|bagaimana|dengan|untuk|karena|dan|atau)\b/i;
+        const forceEnglish = nonEnglishPattern.test(input);
+
         // 🔍 Deteksi apakah pertanyaan tentang konsultasi
         const consultationPattern = /(konsultasi|consultation|jadwal konsultasi|status konsultasi)/i;
         // 🔍 Jika pertanyaan tentang konsultasi
@@ -156,7 +160,11 @@ export async function POST(req: Request) {
             return NextResponse.json({ reply });
         }
 
-        // Kirim permintaan ke Gemini
+        // 🧠 Kirim ke Gemini
+        const finalPrompt = forceEnglish
+            ? `Please respond only in English, even if the question is not in English.`
+            : input;
+
         const response = await fetch(GEMINI_URL, {
             method: "POST",
             headers: {
@@ -166,7 +174,7 @@ export async function POST(req: Request) {
             body: JSON.stringify({
                 contents: [
                     {
-                        parts: [{ text: input }],
+                        parts: [{ text: finalPrompt }],
                     },
                 ],
             }),
