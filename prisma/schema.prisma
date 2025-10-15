@@ -19,6 +19,20 @@ model User {
   Article            Article[]
   PasswordResetToken PasswordResetToken[]
   Consultation       Consultation[]
+  // Relasi ke pesan (dua arah)
+  sentMessages       Message[]            @relation("SentMessages")
+  receivedMessages   Message[]            @relation("ReceivedMessages")
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  senderId   String
+  receiverId String
+  content    String
+  createdAt  DateTime @default(now())
+
+  sender   User @relation("SentMessages", fields: [senderId], references: [id])
+  receiver User @relation("ReceivedMessages", fields: [receiverId], references: [id])
 }
 
 // Untuk Pshikologi
