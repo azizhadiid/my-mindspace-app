@@ -28,14 +28,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ isAdminOnline }) => {
                         </p>
                     </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                    <button className="p-2 text-gray-500 hover:text-pink-500 hover:bg-white rounded-full transition-colors">
-                        <Phone className="h-5 w-5" />
-                    </button>
-                    <button className="p-2 text-gray-500 hover:text-pink-500 hover:bg-white rounded-full transition-colors">
-                        <Video className="h-5 w-5" />
-                    </button>
-                </div>
+
             </div>
         </div>
     );

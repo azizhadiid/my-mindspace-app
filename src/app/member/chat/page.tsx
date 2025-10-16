@@ -30,8 +30,6 @@ const ChatAdminPage = () => {
     // Sample messages - replace with real data from your backend
     const [messages, setMessages] = useState<ChatMessage[]>([
         { id: '1', sender: 'Admin', message: 'Hello! Welcome to MindSpace. How can I help you today?', timestamp: '09:00 AM', isAdmin: true },
-        { id: '2', sender: 'You', message: 'Hi, I have some questions about my subscription plan.', timestamp: '09:02 AM', isAdmin: false },
-        { id: '3', sender: 'Admin', message: 'I\'d be happy to help you with your subscription questions. What specific information do you need?', timestamp: '09:03 AM', isAdmin: true }
     ]);
 
     const scrollToBottom = () => {
@@ -123,8 +121,7 @@ const ChatAdminPage = () => {
                     <MessageInput
                         message={message}
                         setMessage={setMessage}
-                        handleSendMessage={handleSendMessage}
-                        handleKeyPress={handleKeyPress}
+                        onSendMessage={handleSendMessage} // Menggunakan prop baru
                     />
                 </div>
 
