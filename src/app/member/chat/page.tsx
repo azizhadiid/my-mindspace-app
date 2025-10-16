@@ -13,7 +13,7 @@ import MessageInput from "@/components/templates/member/chat/MessageInput";
 import ChatHelpInfo from "@/components/templates/member/chat/ChatHelpInfo";
 
 
-interface ChatMessage {
+interface FormattedMessage {
     id: string;
     sender: string;
     message: string;
@@ -22,15 +22,44 @@ interface ChatMessage {
 }
 
 const ChatAdminPage = () => {
-    const { user, loading } = useAuth("MEMBER");
-    const [message, setMessage] = useState('');
-    const messagesEndRef = useRef<HTMLDivElement>(null);
-    const [isAdminOnline] = useState(true); // You can manage this with real data
+    const { user, loading: authLoading } = useAuth("MEMBER");
+    // ✅ Hanya satu deklarasi state untuk setiap hal
+    const [messages, setMessages] = useState<FormattedMessage[]>([]); // Untuk daftar pesan
+    const [message, setMessage] = useState(''); // Untuk teks input
+    const [isLoading, setIsLoading] = useState(true); // Untuk loading fetch pesan
 
-    // Sample messages - replace with real data from your backend
-    const [messages, setMessages] = useState<ChatMessage[]>([
-        { id: '1', sender: 'Admin', message: 'Hello! Welcome to MindSpace. How can I help you today?', timestamp: '09:00 AM', isAdmin: true },
-    ]);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const [isAdminOnline] = useState(true);
+
+    useEffect(() => {
+        const fetchMessages = async () => {
+            if (!user) return; // Jangan fetch jika user belum terotentikasi
+
+            try {
+                const response = await fetch('/api/member/chat');
+                const data = await response.json();
+
+                // Transformasi data dari backend ke format yang dimengerti frontend
+                const formatted = data.map((msg: any) => ({
+                    id: msg.id,
+                    message: msg.content,
+                    isAdmin: msg.senderId !== user.id, // Jika pengirim BUKAN user, berarti dia Admin
+                    sender: msg.senderId === user.id ? 'You' : 'Admin',
+                    timestamp: new Date(msg.createdAt).toLocaleTimeString([], {
+                        hour: '2-digit', minute: '2-digit'
+                    }),
+                }));
+
+                setMessages(formatted);
+            } catch (error) {
+                console.error("Failed to fetch messages:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchMessages();
+    }, [user]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -38,29 +67,43 @@ const ChatAdminPage = () => {
 
     useEffect(scrollToBottom, [messages]);
 
-    const handleSendMessage = () => {
-        if (message.trim()) {
-            const newMessage: ChatMessage = {
-                id: Date.now().toString(),
+    const handleSendMessage = async () => {
+        if (message.trim() && user) {
+            const tempId = Date.now().toString(); // ID sementara untuk UI
+            const newMessage: FormattedMessage = {
+                id: tempId,
                 sender: 'You',
                 message: message.trim(),
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 isAdmin: false
             };
-            setMessages([...messages, newMessage]);
-            setMessage('');
 
-            // Simulate admin reply (remove this in production)
-            setTimeout(() => {
-                const adminReply: ChatMessage = {
-                    id: (Date.now() + 1).toString(),
-                    sender: 'Admin',
-                    message: 'Thank you for your message. Let me check that for you.',
-                    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    isAdmin: true
-                };
-                setMessages(prev => [...prev, adminReply]);
-            }, 2000);
+            // Optimistic UI: Tampilkan pesan langsung di UI
+            setMessages(prev => [...prev, newMessage]);
+            const currentMessage = message;
+            setMessage(''); // Kosongkan input
+
+            try {
+                const response = await fetch('/api/member/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: currentMessage.trim() }),
+                });
+
+                if (!response.ok) {
+                    // Jika gagal, kembalikan state seperti semula
+                    setMessages(prev => prev.filter(msg => msg.id !== tempId));
+                    setMessage(currentMessage); // Kembalikan teks ke input
+                }
+
+                // Jika sukses, kita bisa update pesan dengan data dari server, atau biarkan saja
+                // Untuk real-time, kita butuh WebSocket, tapi untuk sekarang ini cukup
+
+            } catch (error) {
+                console.error("Failed to send message:", error);
+                setMessages(prev => prev.filter(msg => msg.id !== tempId));
+                setMessage(currentMessage);
+            }
         }
     };
 
@@ -71,7 +114,8 @@ const ChatAdminPage = () => {
         }
     };
 
-    if (loading) {
+    // ✅ Gabungkan kedua kondisi loading
+    if (authLoading || isLoading) {
         return (
             <div className="flex flex-col items-center justify-center h-screen">
                 <div className="w-12 h-12 rounded-full border-4 border-t-4 border-gray-200 border-t-pink-500 animate-spin"></div>
