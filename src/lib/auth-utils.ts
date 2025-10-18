@@ -1,36 +1,33 @@
-// src/lib/auth-utils.ts
+// lib/auth.ts
+import { prisma } from "./prisma";
+import jwt from "jsonwebtoken";
 
-import { NextRequest } from 'next/server';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+const JWT_SECRET = process.env.JWT_SECRET || "supersecretkey";
 
-// Definisikan tipe data untuk payload token kita agar aman secara tipe
-interface TokenPayload extends JwtPayload {
+export type CurrentUser = {
     id: string;
     email: string;
-    role: string;
-}
+    role: "ADMIN" | "MEMBER" | "PSIKOLOG";
+};
 
-export const verifyAuth = async (req: NextRequest): Promise<TokenPayload | null> => {
-    // 1. Ambil token dari cookie di request yang masuk
-    const token = req.cookies.get('token')?.value;
+export async function getCurrentUserFromRequest(req: Request) {
+    try {
+        const cookieHeader = req.headers.get("cookie") || "";
+        const match = cookieHeader.split(";").map(s => s.trim()).find(s => s.startsWith("token="));
+        if (!match) return null;
+        const token = match.split("=")[1];
+        if (!token) return null;
 
-    if (!token) {
-        return null; // Tidak ada token, berarti tidak login
-    }
+        const payload = jwt.verify(token, JWT_SECRET) as CurrentUser;
+        if (!payload?.id) return null;
 
-    // 2. Ambil secret key dari environment variables
-    const secret = process.env.JWT_SECRET;
-    if (!secret) {
-        console.error("JWT_SECRET is not set in .env file");
+        const user = await prisma.user.findUnique({
+            where: { id: payload.id },
+            select: { id: true, name: true, email: true, role: true },
+        });
+        return user;
+    } catch (err) {
+        console.error("getCurrentUserFromRequest error:", err);
         return null;
     }
-
-    try {
-        // 3. Verifikasi token menggunakan secret key
-        const decoded = jwt.verify(token, secret) as TokenPayload;
-        return decoded; // Jika valid, kembalikan payload (berisi id, email, role)
-    } catch (error) {
-        console.error("Invalid token:", error);
-        return null; // Token tidak valid atau kedaluwarsa
-    }
-};
+}

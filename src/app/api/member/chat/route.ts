@@ -1,77 +1,69 @@
-// src/app/api/chat/route.ts
+// app/api/member/chat/route.ts
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getCurrentUserFromRequest } from "@/lib/auth-utils";
 
-import { NextRequest, NextResponse } from 'next/server'; // 🔄 Import NextRequest
-import prisma from '@/lib/prisma';
-import { verifyAuth } from '@/lib/auth-utils';
 
+export async function GET(req: Request) {
+    const user = await getCurrentUserFromRequest(req);
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-// Fungsi GET: Mengambil riwayat chat
-export async function GET(req: NextRequest) { // 🔄 Tambahkan req sebagai parameter
+    // only members can access this endpoint
+    if (user.role !== "MEMBER") {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     try {
-        const tokenPayload = await verifyAuth(req); // 🔄 Panggil petugas keamanan
-        if (!tokenPayload) {
-            return new NextResponse('Unauthorized', { status: 401 });
-        }
-
-        const adminId = process.env.ADMIN_USER_ID;
-        if (!adminId) {
-            return new NextResponse('Admin not configured', { status: 500 });
-        }
-
         const messages = await prisma.message.findMany({
             where: {
                 OR: [
-                    // 🔄 Gunakan tokenPayload.id
-                    { senderId: tokenPayload.id, receiverId: adminId },
-                    { senderId: adminId, receiverId: tokenPayload.id },
+                    { senderId: user.id, receiver: { role: "ADMIN" } },
+                    { receiverId: user.id, sender: { role: "ADMIN" } },
                 ],
             },
-            orderBy: {
-                createdAt: 'asc',
+            include: {
+                sender: { select: { id: true, name: true, role: true } },
+                receiver: { select: { id: true, name: true, role: true } },
             },
+            orderBy: { createdAt: "asc" },
         });
 
         return NextResponse.json(messages);
-
-    } catch (error) {
-        console.error("[CHAT_GET_ERROR]", error);
-        return new NextResponse('Internal Server Error', { status: 500 });
+    } catch (err) {
+        console.error(err);
+        return NextResponse.json({ error: "Internal server error" }, { status: 500 });
     }
 }
 
+export async function POST(req: Request) {
+    const user = await getCurrentUserFromRequest(req);
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (user.role !== "MEMBER") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-// Fungsi POST: Mengirim pesan baru
-export async function POST(req: NextRequest) { // 🔄 Tambahkan req sebagai parameter
     try {
-        const tokenPayload = await verifyAuth(req); // 🔄 Panggil petugas keamanan
-        if (!tokenPayload) {
-            return new NextResponse('Unauthorized', { status: 401 });
-        }
-
-        const adminId = process.env.ADMIN_USER_ID;
-        if (!adminId) {
-            return new NextResponse('Admin not configured', { status: 500 });
-        }
-
         const body = await req.json();
-        const { content } = body;
+        const content = (body.content || "").toString().trim();
+        if (!content) return NextResponse.json({ error: "Content required" }, { status: 400 });
 
-        if (!content) {
-            return new NextResponse('Content is required', { status: 400 });
-        }
+        // Pilih admin (mis: admin pertama) — bisa disesuaikan
+        const admin = await prisma.user.findFirst({ where: { role: "ADMIN" }, orderBy: { createdAt: "asc" } });
+        if (!admin) return NextResponse.json({ error: "No admin available" }, { status: 500 });
 
-        const newMessage = await prisma.message.create({
+        const created = await prisma.message.create({
             data: {
-                senderId: tokenPayload.id, // 🔄 Gunakan tokenPayload.id
-                receiverId: adminId,
-                content: content,
-            }
+                senderId: user.id,
+                receiverId: admin.id,
+                content,
+            },
+            include: {
+                sender: { select: { id: true, name: true } },
+                receiver: { select: { id: true, name: true } },
+            },
         });
 
-        return NextResponse.json(newMessage);
-
-    } catch (error) {
-        console.error("[CHAT_POST_ERROR]", error);
-        return new NextResponse('Internal Server Error', { status: 500 });
+        return NextResponse.json(created, { status: 201 });
+    } catch (err) {
+        console.error(err);
+        return NextResponse.json({ error: "Internal server error" }, { status: 500 });
     }
 }
