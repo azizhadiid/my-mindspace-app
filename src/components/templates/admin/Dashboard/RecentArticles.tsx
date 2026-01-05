@@ -1,7 +1,9 @@
 import React from 'react';
 import { MoreVertical } from 'lucide-react';
+import Link from 'next/link';
 
 const RecentArticles = () => {
+    // Data titles can remain mixed or be translated based on your DB content
     const articles = [
         { title: 'Tips Mengatasi Anxiety', views: 1247, status: 'Published' },
         { title: 'Mindfulness untuk Pemula', views: 892, status: 'Draft' },
@@ -11,10 +13,14 @@ const RecentArticles = () => {
     return (
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200">
             <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-800">Artikel Terbaru</h3>
-                <button className="text-pink-500 hover:text-pink-600 text-sm font-medium">
-                    Kelola Artikel
-                </button>
+                {/* Translated Header */}
+                <h3 className="text-lg font-semibold text-gray-800">Recent Articles</h3>
+                <Link
+                    href="/admin/article/edit"
+                    className="text-pink-500 hover:text-pink-600 text-sm font-medium"
+                >
+                    Manage Articles
+                </Link>
             </div>
             <div className="space-y-4">
                 {articles.map((article, index) => (

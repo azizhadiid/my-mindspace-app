@@ -1,5 +1,4 @@
 import React from 'react';
-
 import {
     Users, UserCheck, MessageCircle, Heart
 } from 'lucide-react';
@@ -13,28 +12,28 @@ const DashboardContent = () => (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <StatsCard
                 icon={Users}
-                title="Total Pengguna"
+                title="Total Users" // Translated
                 value="2,847"
                 change={12}
                 color="blue"
             />
             <StatsCard
                 icon={UserCheck}
-                title="Psikolog Aktif"
+                title="Active Psychologists" // Translated
                 value="24"
                 change={8}
                 color="green"
             />
             <StatsCard
                 icon={MessageCircle}
-                title="Konsultasi Hari Ini"
+                title="Today's Consultations" // Translated
                 value="156"
                 change={-3}
                 color="pink"
             />
             <StatsCard
                 icon={Heart}
-                title="Rating Kepuasan"
+                title="Satisfaction Rate" // Translated
                 value="4.8"
                 change={2}
                 color="purple"
