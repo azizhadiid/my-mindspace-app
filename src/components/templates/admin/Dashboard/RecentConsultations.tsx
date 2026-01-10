@@ -32,27 +32,27 @@ const RecentConsultations: React.FC<RecentConsultationsProps> = ({ data = [], st
 
         // --- Bagian Header ---
         doc.setFontSize(18);
-        doc.text('Laporan Dashboard Admin', 14, 20);
+        doc.text('Admin Dashboard Report', 14, 20);
 
         doc.setFontSize(10);
-        doc.text(`Dicetak pada: ${new Date().toLocaleString('id-ID')}`, 14, 28);
+        doc.text(`Printed on: ${new Date().toLocaleString('id-ID')}`, 14, 28);
         doc.line(14, 32, 196, 32); // Garis horizontal
 
         // --- Bagian 1: Ringkasan Statistik (Pertumbuhan Pengguna) ---
         if (stats) {
             doc.setFontSize(14);
-            doc.text('Ringkasan Statistik', 14, 42);
+            doc.text('Statistics Summary', 14, 42);
 
             const statsData = [
-                ['Total Pengguna (Member)', stats.totalUsers.toLocaleString()],
-                ['Psikolog Aktif', stats.activePsychologists.toLocaleString()],
-                ['Konsultasi Hari Ini', stats.todayConsultations.toLocaleString()],
-                ['Tingkat Kepuasan', `${stats.satisfactionRate} / 5.0`],
+                ['Total Users (Member)', stats.totalUsers.toLocaleString()],
+                ['Active Psychologists', stats.activePsychologists.toLocaleString()],
+                ['Consultations Today', stats.todayConsultations.toLocaleString()],
+                ['Satisfaction Rate', `${stats.satisfactionRate} / 5.0`],
             ];
 
             autoTable(doc, {
                 startY: 45,
-                head: [['Metrik', 'Nilai']],
+                head: [['Metric', 'Value']],
                 body: statsData,
                 theme: 'plain', // Tampilan tabel sederhana untuk stats
                 styles: { fontSize: 10, cellPadding: 2 },
@@ -66,7 +66,7 @@ const RecentConsultations: React.FC<RecentConsultationsProps> = ({ data = [], st
         const finalY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 15 : 40;
 
         doc.setFontSize(14);
-        doc.text('Riwayat Konsultasi Terbaru', 14, finalY);
+        doc.text('Recent Consultation History', 14, finalY);
 
         // Menyiapkan data untuk tabel
         const tableBody = data.map(item => [
@@ -78,7 +78,7 @@ const RecentConsultations: React.FC<RecentConsultationsProps> = ({ data = [], st
 
         autoTable(doc, {
             startY: finalY + 5,
-            head: [['Nama Pasien', 'Psikolog', 'Waktu', 'Status']],
+            head: [['Patient Name', 'Psychologist', 'Time', 'Status']],
             body: tableBody,
             headStyles: { fillColor: [236, 72, 153] }, // Warna Pink (sesuai tema Anda)
             styles: { fontSize: 10 },
@@ -86,7 +86,7 @@ const RecentConsultations: React.FC<RecentConsultationsProps> = ({ data = [], st
         });
 
         // --- Simpan File ---
-        doc.save(`Laporan_Dashboard_${new Date().toISOString().slice(0, 10)}.pdf`);
+        doc.save(`Dashboard_Report_${new Date().toISOString().slice(0, 10)}.pdf`);
     };
 
     // Helper function untuk warna status
