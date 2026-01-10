@@ -20,6 +20,8 @@
     "bcryptjs": "^3.0.2",
     "framer-motion": "^12.23.12",
     "jsonwebtoken": "^9.0.2",
+    "jspdf": "^4.0.0",
+    "jspdf-autotable": "^5.0.7",
     "lucide-react": "^0.539.0",
     "midtrans-client": "^1.4.3",
     "next": "15.4.6",
