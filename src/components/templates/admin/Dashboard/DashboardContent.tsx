@@ -90,7 +90,7 @@ const DashboardContent = () => {
 
             {/* Recent Activities */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <RecentConsultations data={data?.recentConsultations} />
+                <RecentConsultations data={data?.recentConsultations} stats={data?.stats} />
                 <RecentArticles data={data?.recentArticles} />
             </div>
         </div>
