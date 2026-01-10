@@ -5,229 +5,134 @@ import { cookies } from "next/headers";
 
 const prisma = new PrismaClient();
 
-const GEMINI_MODEL = "gemini-2.0-flash"; // atau gemini-1.5-pro, sesuai kebutuhan
+// 🛠️ UPDATE: Menggunakan Gemini 2.5 Flash (Model Standar 2026)
+const GEMINI_MODEL = "gemini-2.5-flash";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+
+// 🧠 SYSTEM INSTRUCTION (ENFORCED ENGLISH)
+const SYSTEM_INSTRUCTION = `
+You are MindBot, a professional yet empathetic mental health assistant for "MindSpace".
+
+CRITICAL RULES:
+1. **LANGUAGE**: You must ONLY speak in ENGLISH. If the user speaks another language (like Indonesian), politely reply in English that you can only communicate in English.
+2. **ROLE**: Act as a supportive counselor. Listen actively.
+3. **SAFETY**: If a user mentions suicide or self-harm, IMMEDIATELY provide standard emergency hotline info.
+4. **LIMITATION**: Do not provide medical diagnoses.
+5. **CONTEXT**: You have access to the database of psychologists.
+`;
 
 export async function POST(req: Request) {
     try {
         const { input } = await req.json();
-        // 🧩 Ambil token dari cookies
+
+        // 1. Auth Check (Optional but recommended)
         const cookieStore = await cookies();
         const token = cookieStore.get("token")?.value;
-
         let userId: string | null = null;
-
         if (token) {
             try {
-                const decoded = jwt.verify(token, process.env.JWT_SECRET || "supersecretkey") as {
-                    id: string;
-                    email: string;
-                    role: string;
-                };
+                const decoded = jwt.verify(token, process.env.JWT_SECRET || "supersecretkey") as { id: string };
                 userId = decoded.id;
-            } catch (err) {
-                console.warn("Invalid or expired token:", err);
-            }
+            } catch (err) { console.warn("Token issue:", err); }
         }
 
-        if (!input) {
-            return NextResponse.json({ error: "Missing input message" }, { status: 400 });
-        }
-
+        if (!input) return NextResponse.json({ error: "Input required" }, { status: 400 });
         const apiKey = process.env.GEMINI_API_KEY;
-        if (!apiKey) {
-            return NextResponse.json({ error: "Missing GEMINI_API_KEY" }, { status: 500 });
-        }
+        if (!apiKey) return NextResponse.json({ error: "API Key missing" }, { status: 500 });
 
-        // 🧠 Deteksi apakah input bukan bahasa Inggris
-        const nonEnglishPattern = /\b(yang|saya|tidak|apa|itu|ini|kenapa|bagaimana|dengan|untuk|karena|dan|atau)\b/i;
-        const forceEnglish = nonEnglishPattern.test(input);
+        // ==================================================================================
+        // 🔍 DATABASE LOGIC: PSYCHOLOGIST & PRICE RECOMMENDATION
+        // ==================================================================================
 
-        // 🔍 Deteksi apakah pertanyaan tentang konsultasi
-        const consultationPattern = /(konsultasi|consultation|jadwal konsultasi|status konsultasi)/i;
-        // 🔍 Jika pertanyaan tentang konsultasi
-        if (consultationPattern.test(input)) {
-            if (!userId) {
-                return NextResponse.json({
-                    reply:
-                        "You are not logged in yet 🌸 Please log in first to see your consultation schedule.",
-                });
-            }
+        // Regex untuk mendeteksi niat mencari psikolog atau tanya harga
+        const doctorIntent = /(find|looking for|need|recommend|search) (psychologist|therapist|doctor|counselor)/i;
+        const priceIntent = /(price|cost|fee|how much|expensive|cheap)/i;
+        const problemIntent = /(anxiety|depression|stress|family|marriage|child|kid|teen|career|work|sleep|insomnia)/i;
 
-            const consultations = await prisma.consultation.findMany({
-                where: { userId },
-                orderBy: { date: "asc" },
-                take: 5,
-            });
+        // Jika user bertanya tentang psikolog, harga, atau menyebutkan masalah spesifik
+        if (doctorIntent.test(input) || priceIntent.test(input) || problemIntent.test(input)) {
 
-            if (consultations.length === 0) {
-                return NextResponse.json({
-                    reply:
-                        "You currently don't have a consultation scheduled on MindSpace. You can create a new one by clicking the *Create New Consultation* menu. 🌿",
-                });
-            }
-
-            // Format ke teks
-            const formatted = consultations
-                .map((c, i) => {
-                    const date = new Date(c.date).toLocaleString("id-ID", {
-                        weekday: "long",
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                    });
-
-                    const urgencyText =
-                        c.urgency === "high"
-                            ? "🔥 Urgent"
-                            : c.urgency === "medium"
-                                ? "⚡ Medium"
-                                : "🕊️ Low";
-
-                    return `${i + 1}. **${c.name_psikolog}** (${c.type}) – ${c.main_topic}
-                        📅 ${date}
-                        📌 Status: ${c.status}
-                        🎯 Priority: ${urgencyText}`;
-                })
-                .join("\n\n");
-
-            const reply = `Here is your consultation schedule at MindSpace:\n\n${formatted}\n\nHope your consultation session goes smoothly 🌼`;
-
-            return NextResponse.json({ reply });
-        }
-
-        // Rekomendasi psikolog
-        const psychologistPattern =
-            /(best psychologist|psychologist recommendation|best psychologist|psychologist recommendation|good psychologist|psychologist suggestion|psychologist for|suitable psychologist)/i;
-
-        if (psychologistPattern.test(input)) {
-            // 🔎 Context detection (child, teenager, adult, family, etc) 
+            // 1. Deteksi Spesialisasi berdasarkan input user
             let specializationFilter: string | undefined;
 
-            if (/child|child|children/i.test(input)) specializationFilter = "Children";
-            else if (/teen|teen|teenager|adolescent/i.test(input)) specializationFilter = "Teenager";
-            else if (/adult|adult/i.test(input)) specializationFilter = "Adult";
-            else if (/family|family|marriage|couple/i.test(input)) specializationFilter = "Family";
-            else if (/career|work|work|career/i.test(input)) specializationFilter = "Career";
+            // Mapping kata kunci user ke data 'specialization' di database
+            if (/child|kid|baby|parenting/i.test(input)) specializationFilter = "Children";
+            else if (/teen|adolescent|school/i.test(input)) specializationFilter = "Teenager";
+            else if (/family|marriage|wife|husband|couple|divorce/i.test(input)) specializationFilter = "Family";
+            else if (/career|work|job|burnout|office/i.test(input)) specializationFilter = "Career";
+            else if (/anxiety|depression|stress|mood/i.test(input)) specializationFilter = "Clinical"; // Asumsi ada spesialisasi 'Clinical' atau sesuaikan
 
-            // 🔸 Query ke database
-            const whereClause: Prisma.PsychologistWhereInput = specializationFilter
-                ? {
-                    specialization: {
-                        contains: specializationFilter,
-                        mode: Prisma.QueryMode.insensitive, // ✅ perbaikan di sini
-                    },
-                }
-                : {};
+            // 2. Query Database
+            const whereClause: Prisma.PsychologistWhereInput = {
+                verified: true, // Hanya ambil yang terverifikasi
+                ...(specializationFilter && {
+                    specialization: { contains: specializationFilter, mode: Prisma.QueryMode.insensitive }
+                })
+            };
 
-            const topPsychologists = await prisma.psychologist.findMany({
+            const psychologists = await prisma.psychologist.findMany({
                 where: whereClause,
-                orderBy: { rating: "desc" },
-                take: 3,
+                orderBy: { rating: 'desc' }, // Urutkan rating tertinggi
+                take: 3
             });
 
-            if (topPsychologists.length === 0) {
+            // 3. Susun Jawaban (Strictly English)
+            if (psychologists.length === 0) {
+                // Jika tidak ada spesialisasi khusus, tawarkan yang umum
+                if (specializationFilter) {
+                    return NextResponse.json({
+                        reply: `I currently couldn't find a specialist specifically for *${specializationFilter}*. However, you can browse our top-rated psychologists in the "Consultation" menu.`
+                    });
+                }
+                // Fallback ke general AI jika database kosong
+            } else {
+                const formattedList = psychologists.map(p => {
+                    // Format harga ke IDR (tapi teks tetap Inggris)
+                    // Asumsi field p.price string "150000" atau angka
+                    return `• **${p.name}**\n  - Specialization: ${p.specialization}\n  - Rating: ⭐ ${p.rating}/5\n  - Price: ${p.price}`;
+                }).join("\n\n");
+
+                const intro = specializationFilter
+                    ? `Here are our best psychologists specializing in **${specializationFilter}**:`
+                    : `Here are some of our highly-rated psychologists based on your request:`;
+
                 return NextResponse.json({
-                    reply:
-                        specializationFilter
-                            ? `There are currently no psychologists listed with the specialty ${specializationFilter} in MindSpace. 🌱`
-                            : "There are no psychologists listed in MindSpace yet.",
+                    reply: `${intro}\n\n${formattedList}\n\nWould you like to book a session with one of them?`
                 });
             }
-
-            // 🔸 Format respons
-            const formatted = topPsychologists
-                .map((p, i) => {
-                    const priceNumber = parseFloat(p.price.replace(/[^\d]/g, "")) || 0;
-                    const priceFormatted = new Intl.NumberFormat("id-ID", {
-                        style: "currency",
-                        currency: "IDR",
-                        minimumFractionDigits: 0,
-                    }).format(priceNumber);
-
-                    return `${i + 1}. **${p.name}** (${p.specialization}) – ⭐ ${p.rating.toFixed(
-                        1
-                    )}/5\n🧠 Experience: ${p.experience}\n💰 Cost: ${priceFormatted}`;
-                })
-                .join("\n\n");
-
-            const reply = specializationFilter
-                ? `Here are the best psychologist recommendations on MindSpace for the case *${specializationFilter.toLowerCase()}*:\n\n${formatted}\n\nAll of these psychologists have been verified and are ready to help 💬`
-                : `Here are some of the best psychologists on MindSpace based on the highest ratings:\n\n${formatted}\n\nAll of these psychologists have been verified and are ready to help 💬`;
-
-            return NextResponse.json({ reply });
         }
 
-        // 🧠 Kirim ke Gemini
-        const finalPrompt = forceEnglish
-            ? `Please respond only in English, even if the question is not in English.`
-            : input;
+        // ==================================================================================
+        // 🤖 AI CHAT LOGIC (Strictly English via System Instruction)
+        // ==================================================================================
 
-        const response = await fetch(GEMINI_URL, {
+        const response = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "x-goog-api-key": apiKey,
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                contents: [
-                    {
-                        parts: [{ text: finalPrompt }],
-                    },
-                ],
+                system_instruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
+                contents: [{ role: "user", parts: [{ text: input }] }],
+                generationConfig: {
+                    temperature: 0.7,
+                    maxOutputTokens: 300, // Jawaban padat
+                }
             }),
         });
 
         const data = await response.json();
 
-        // 🔹 Cek error dari Gemini
         if (!response.ok) {
-            console.error("Gemini error:", data);
-
-            // 🔸 Tangani error kuota/token habis
-            if (
-                data.error?.status === "RESOURCE_EXHAUSTED" ||
-                data.error?.message?.toLowerCase()?.includes("quota") ||
-                data.error?.message?.toLowerCase()?.includes("exceeded") ||
-                data.error?.message?.toLowerCase()?.includes("token")
-            ) {
-                return NextResponse.json({
-                    reply:
-                        "Sorry, MindBot is currently taking a break because the daily usage limit has been reached. Please try again later 💖",
-                });
+            if (response.status === 429) {
+                return NextResponse.json({ reply: "I'm currently overwhelmed. Please try again in a moment. (Quota Limit)" });
             }
-
-            // 🔸 Tangani error key tidak valid
-            if (data.error?.status === "UNAUTHENTICATED") {
-                return NextResponse.json({
-                    reply:
-                        "Oops, MindBot is having trouble connecting to the server. Please try again later. 🌸",
-                });
-            }
-
-            // 🔸 Default error lain
-            return NextResponse.json(
-                { reply: "Sorry, MindBot is experiencing problems. Please try again later 🌼" },
-                { status: 502 }
-            );
+            return NextResponse.json({ reply: "I am having trouble connecting right now. Please try again." });
         }
 
-        // ✅ Kalau sukses
-        const reply =
-            data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-            "Sorry, I can't respond at this time.";
-
+        const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || "I'm listening...";
         return NextResponse.json({ reply });
+
     } catch (err) {
-        console.error("MindBot API Error:", err);
-        return NextResponse.json(
-            {
-                reply:
-                    "Oops, an error occurred on the server. Please try again later. 🌷",
-            },
-            { status: 500 }
-        );
+        console.error("Server Error:", err);
+        return NextResponse.json({ reply: "Internal system error." }, { status: 500 });
     }
 }
