@@ -1,52 +1,69 @@
-// file: src/lib/brevo.ts
+// src/lib/brevo.ts
 
-const brevoApiKey = process.env.BREVO_API_KEY;
-
+/**
+ * Fungsi utama untuk mengirim email menggunakan Brevo API (SMTP)
+ */
 export async function sendBrevoEmail(toEmail: string, subject: string, htmlContent: string) {
-    if (!brevoApiKey) {
-        console.error("Brevo API key is not set. Please check your .env.local file.");
-        return;
+    // 1. PENTING: Baca variabel environment DI DALAM fungsi (Runtime)
+    // Agar terbaca dengan benar saat fungsi dipanggil
+    const apiKey = process.env.BREVO_API_KEY;
+    const senderName = process.env.BREVO_SENDER_NAME || "MindSpace Support";
+    const senderEmail = process.env.BREVO_SENDER_EMAIL || "admin@mindspace.com";
+
+    // 2. Debugging (Cek apakah key terbaca)
+    if (!apiKey) {
+        console.error("❌ CRITICAL ERROR: BREVO_API_KEY is missing in .env file.");
+        throw new Error("Server configuration error: Missing Email API Key");
     }
 
+    // URL API Brevo v3
+    const url = "https://api.brevo.com/v3/smtp/email";
+
+    // Payload sesuai dokumentasi Brevo
     const payload = {
         sender: {
-            name: process.env.BREVO_SENDER_NAME,
-            email: process.env.BREVO_SENDER_EMAIL,
+            name: senderName,
+            email: senderEmail,
         },
         to: [
             {
                 email: toEmail,
             },
         ],
-        subject,
-        htmlContent,
+        subject: subject,
+        htmlContent: htmlContent,
     };
 
     try {
-        const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+        const response = await fetch(url, {
             method: "POST",
             headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-                "api-key": brevoApiKey,
+                "accept": "application/json",
+                "content-type": "application/json",
+                "api-key": apiKey, // Header wajib untuk autentikasi
             },
             body: JSON.stringify(payload),
         });
 
         if (!response.ok) {
             const errorData = await response.json();
-            console.error("Failed to send email via Brevo:", errorData);
-            throw new Error("Failed to send email");
+            console.error("❌ Failed to send email via Brevo:", JSON.stringify(errorData, null, 2));
+            throw new Error(`Email failed: ${errorData.message || response.statusText}`);
         }
 
-        console.log("Email sent successfully via Brevo!");
+        console.log(`✅ Email sent successfully to ${toEmail}`);
+        return await response.json();
+
     } catch (error) {
-        console.error("An error occurred while sending email:", error);
+        console.error("⚠️ Error in sendBrevoEmail function:", error);
         throw error;
     }
 }
 
-// 👇 TAMBAHKAN FUNGSI BARU DI BAWAH INI 👇
+/**
+ * Fungsi khusus untuk mengirim email konfirmasi konsultasi
+ * Memanggil fungsi sendBrevoEmail di dalamnya
+ */
 export async function sendConsultationConfirmationEmail({
     toEmail,
     userName,
@@ -63,17 +80,19 @@ export async function sendConsultationConfirmationEmail({
     const subject = "✅ Confirmation of Your Consultation Schedule Has Been Successful";
 
     // Format nomor telepon untuk link WhatsApp (misal: 0812... -> 62812...)
-    const formattedPhone = psychologistPhone.startsWith('0')
-        ? '62' + psychologistPhone.substring(1)
-        : psychologistPhone;
+    // Pastikan psychologistPhone tidak undefined/null
+    const phone = psychologistPhone || "";
+    const formattedPhone = phone.startsWith('0')
+        ? '62' + phone.substring(1)
+        : phone;
     const waLink = `https://wa.me/${formattedPhone}`;
 
-    // Format tanggal agar mudah dibaca
+    // Format tanggal agar mudah dibaca (Bahasa Indonesia)
     const formattedDate = new Intl.DateTimeFormat('id-ID', {
         dateStyle: 'full',
         timeStyle: 'short',
-        timeZone: 'Asia/Jakarta' // Pastikan timezone sesuai
-    }).format(consultationDate);
+        timeZone: 'Asia/Jakarta'
+    }).format(new Date(consultationDate));
 
     // Buat konten HTML untuk email
     const htmlContent = `
@@ -135,12 +154,13 @@ export async function sendConsultationConfirmationEmail({
     </div>
     `;
 
-    // Panggil fungsi generic yang sudah Anda buat
+    // Panggil fungsi generic sendBrevoEmail
     try {
         await sendBrevoEmail(toEmail, subject, htmlContent);
-        console.log(`Email konfirmasi konsultasi berhasil dikirim ke ${toEmail}`);
+        console.log(`✅ Confirmation email sent to ${toEmail}`);
     } catch (error) {
-        console.error("Gagal mengirim email konfirmasi konsultasi:", error);
-        // Penting: Jangan throw error lagi agar proses utama tidak berhenti
+        console.error("❌ Failed to send confirmation email:", error);
+        // Kita tangkap error di sini agar tidak memutus flow transaksi utama (jika ada)
+        // Tapi tetap di-log di server
     }
 }
