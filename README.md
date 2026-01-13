@@ -1,14 +1,12 @@
 # 🧠 MindSpace - Mental Health Consultation Platform
 
-![MindSpace Banner](public/img/banner-placeholder.png)
-
 **MindSpace** is a modern mental health platform connecting users with professional psychologists. Built with the latest web technologies, this application features real-time consultation, schedule management, and **AI Chatbot (MindBot)** as an intelligent emotional companion.
 
 ## 🎥 Video Demo
 
 Watch a quick demonstration of MindSpace in action, featuring the AI Chatbot and Consultation Booking flow.
 
-[![MindSpace Demo Video](https://img.youtube.com/vi/YOUR_VIDEO_ID_HERE/maxresdefault.jpg)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID_HERE)
+[![MindSpace Demo Video](public/img/banner-placeholder.png)](https://youtu.be/BNhqBP2cBvI)
 
 > *Click the image above to watch the walkthrough on YouTube.*
 
